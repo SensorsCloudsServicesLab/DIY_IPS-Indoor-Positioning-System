@@ -1,7 +1,4 @@
 <resources>
     <string name="app_name">Indoor Positioning</string>
-    <string name="Indoor_WiFi_positing">Indoor_WiFi_positing</string>
-    <string name="dialog_name">AlertDialog</string>
-    <string name="dialog_message">Welcome to Alert Dialog</string>
-    <string name="dialog_title">Javatpoint Alert Dialog</string>
+    <string name="indoor_wifi_positioning">Indoor WiFi Positioning</string>
 </resources>

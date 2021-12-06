@@ -8,13 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
-
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.text.DecimalFormat;
@@ -34,10 +27,7 @@ public class ListAdapter extends BaseAdapter {
     public ListAdapter(Context context, List<ScanResult> wifiList) {
         this.context = context;
         this.wifiList = wifiList;
-
-        inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-
+        this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -64,10 +54,10 @@ public class ListAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.list_item, null);
             holder = new Holder();
 
-            holder.networkName = (TextView)view.findViewById(R.id.txtWifiName);
-            holder.RSSI = (TextView)view.findViewById(R.id.WiFiRSSI);
-            holder.Frequency = (TextView)view.findViewById(R.id.WiFiFrequency);
-            holder.Distance = (TextView)view.findViewById(R.id.WiFiDistance);
+            holder.networkName = view.findViewById(R.id.txtWifiName);
+            holder.RSSI = view.findViewById(R.id.WiFiRSSI);
+            holder.Frequency = view.findViewById(R.id.WiFiFrequency);
+            holder.Distance = view.findViewById(R.id.WiFiDistance);
             view.setTag(holder);
 
         } else {
@@ -104,47 +94,20 @@ public class ListAdapter extends BaseAdapter {
                             stringMacByte = "0" + stringMacByte;
                         }
                         macAddress = macAddress + stringMacByte.toUpperCase() + ":";
-                        HashMap<String, String> networkCollection = new HashMap<>();
 
                         networkData.put("macAddress", macAddress);
-                        //  String networkDetail[] = new String[2];
 
                         if(!wifiList.get(position).SSID.isEmpty() & !(wifiList.get(position).SSID == null)){
-                            //    networkCollection.put(wifiList.get(position).SSID, String.valueOf(wifiList.get(position).level));
-                            //  networkData.put("networkCollection", networkCollection);
                             networkData.put(wifiList.get(position).SSID, String.valueOf(wifiList.get(position).level));
-
-
-
-
                         }
-
-                        //    networkData.put("GeoPoint", LatLng.getText().toString());
-
                     }
                     break;
                 }
             }
-            // Mac_address.setText(macAddress);
 
         } catch (SocketException e){
             e.printStackTrace();
         }
-        //  DocumentReference docRef = db.collection("WBIP").document(networkData.get("macAddress").toString());
-        System.out.println("----firebase docRef------");
-        System.out.println(networkData);
-
-        //db.collection("WBIP").document(networkData.get("macAddress").toString()).push
-
-
-
-
-        //   holder.RSSI.setText(wifiList.get(position).level);
-        //  holder.tvDetails.setText(wifiList.get(position).level);
-        System.out.println("wifilist: " + wifiList.get(position).SSID);
-        System.out.println(wifiList.get(position).level);
-
-
 
         return view;
     }
@@ -160,6 +123,4 @@ public class ListAdapter extends BaseAdapter {
         double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
         return Math.pow(10.0, exp);
     }
-
-
 }

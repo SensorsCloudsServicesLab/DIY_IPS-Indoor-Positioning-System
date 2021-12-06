@@ -103,32 +103,11 @@
         android:layout_marginEnd="3dp"
         android:ems="10"
         android:inputType="textPersonName"
+        android:minHeight="48dp"
         android:text="Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/distance" />
-
-    <Button
-        android:id="@+id/saveCoordinate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="31dp"
-        android:onClick="testSharedPreference"
-        android:text="Save coordinate"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/editTextCoordinate" />
-
-    <Button
-        android:id="@+id/readButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="28dp"
-        android:text="Read coordinate"
-        android:onClick="readDataToScreen"
-        app:layout_constraintStart_toStartOf="@+id/saveCoordinate"
-        app:layout_constraintTop_toBottomOf="@+id/saveCoordinate" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
