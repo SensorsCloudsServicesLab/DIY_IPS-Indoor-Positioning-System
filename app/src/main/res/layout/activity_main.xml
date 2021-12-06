@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity"
+
+    android:fillViewport="true">
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        >
+
+        <fragment
+            android:id="@+id/fragment"
+            class="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+
+            android:layout_centerHorizontal="true"
+            />
+
+        <RelativeLayout
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <TextView
+                android:id="@+id/text_view_id"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="@string/Indoor_WiFi_positing" />
+
+            <TextView
+                android:layout_below="@id/text_view_id"
+                android:id="@+id/Mac_address"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+
+                android:text="Mac_Address" />
+
+            <TextView
+                android:layout_below="@id/Mac_address"
+                android:id="@+id/Latlng"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+
+                android:text="Latlng" />
+
+
+            <Button
+                android:id="@+id/click"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/networkListView"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="-2dp"
+                android:paddingStart="20dp"
+                android:paddingTop="20dp"
+                android:paddingEnd="20dp"
+
+                android:paddingBottom="20dp"
+                android:text="Click" />
+
+            <ListView
+                android:id="@+id/networkListView"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_below="@+id/Latlng"
+                android:layout_marginTop="8dp">
+
+
+            </ListView>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="intersection"
+                android:layout_below="@+id/click"
+                android:layout_marginTop="6dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/intersectionPoints"
+                    android:inputType="textMultiLine"
+                    android:lines="8"
+                    android:gravity="top"
+                    android:overScrollMode="always"
+                    android:scrollbars="vertical"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollHorizontally="false"
+                    >
+                </com.google.android.material.textfield.TextInputEditText>
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear" />
+
+
+    </RelativeLayout>
+
+</ScrollView>
