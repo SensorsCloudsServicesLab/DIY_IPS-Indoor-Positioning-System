@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Indoor Positioning</string>
     <string name="indoor_wifi_positioning">Indoor WiFi Positioning</string>
+    <string name="automatic_gps_title">Automatic GPS</string>
+    <string name="user_id_title">User ID</string>
+    <string name="detected_networks">Detected Networks</string>
+    <string name="refresh">Refresh</string>
 </resources>

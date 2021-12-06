@@ -1,5 +1,6 @@
 package com.scslab.indoorpositioning;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,19 +8,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.provider.Settings;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdate;
@@ -28,12 +25,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.List;
 
@@ -43,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ListView networkListView;
     private Button checkLocationButton;
 
-    boolean isPermissionGranted;
     GoogleMap mGoogleMap;
 
     WifiManager wifiManager;
@@ -61,11 +51,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         //Find all views
         this.latLongText = findViewById(R.id.Latlng);
         this.networkListView = findViewById(R.id.networkListView);
-        this.checkLocationButton = findViewById(R.id.click);
+        this.checkLocationButton = findViewById(R.id.check_location_button);
 
         //Initialisations
-        checkPermissions();
-
         initMap();
         initNetwork();
         initUI();
@@ -73,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         getGPSLocation();
         getNetworkLocation();
 
-        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         } else {
             getNetworkLocation();
@@ -93,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initNetwork() {
-        this.wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        this.wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
     private void getNetworkLocation() {
@@ -104,17 +92,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initMap() {
-        fusedLocationProviderClient = new FusedLocationProviderClient(this);
-
-        if(isPermissionGranted){
-            SupportMapFragment supportMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentById(R.id.fragment);
-            supportMapFragment.getMapAsync(this::onMapReady);
+        if (!checkOrRequestLocationPermissions()) {
+            return;
         }
+
+        fusedLocationProviderClient = new FusedLocationProviderClient(this);
+        SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+        supportMapFragment.getMapAsync(this::onMapReady);
     }
+
     @SuppressLint("MissingPermission")
     private void getGPSLocation() {
+        if (!checkOrRequestLocationPermissions()) {
+            return;
+        }
+
         fusedLocationProviderClient.getLastLocation().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
+            if (task.isSuccessful()) {
                 Location location = task.getResult();
                 gotoLocation(location.getLatitude(), location.getLongitude());
                 latLongText.setText(location.getLatitude() + ", " + location.getLongitude());
@@ -129,32 +123,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
-    private void checkPermissions() {
-        Dexter.withContext(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                Toast.makeText(MainActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
-                isPermissionGranted = true;
-            }
 
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                Intent intent = new Intent();
-                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                Uri uri = Uri.fromParts("package", getPackageName(), "");
-                intent.setData(uri);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                permissionToken.continuePermissionRequest();
-            }
-        }).check();
+    private boolean checkOrRequestLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, 0);
+            return false;
+        }
     }
 
     @SuppressLint("MissingPermission")
     public void onMapReady(GoogleMap googleMap) {
+        if (!checkOrRequestLocationPermissions()){
+            return;
+        }
         mGoogleMap = googleMap;
         mGoogleMap.setMyLocationEnabled(true);
     }
