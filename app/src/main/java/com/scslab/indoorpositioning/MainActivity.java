@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.wifi.ScanResult;
@@ -72,11 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initUI() {
         checkLocationButton.setOnClickListener(v -> this.getNetworkLocation());
         networkListView.setOnItemClickListener((parent, view, position, id) -> {
-            Intent newIntent = new Intent(MainActivity.this, NetworkActivity.class);
-            newIntent.putExtra("SSID", wifiList.get(position).SSID);
-            newIntent.putExtra("RSSI", String.valueOf(wifiList.get(position).level));
-            newIntent.putExtra("Frequency", String.valueOf(wifiList.get(position).frequency));
-            startActivity(newIntent);
+
         });
     }
 

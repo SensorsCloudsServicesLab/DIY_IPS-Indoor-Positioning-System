@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListAdapter extends BaseAdapter {
@@ -19,8 +19,14 @@ public class ListAdapter extends BaseAdapter {
 
     public ListAdapter(Context context, List<ScanResult> wifiList) {
         this.context = context;
-        this.wifiList = wifiList;
+        this.wifiList = new ArrayList<>();
         this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        for (ScanResult scanResult : wifiList) {
+            if (scanResult.SSID.contains("SCS_LAB")) {
+                this.wifiList.add(scanResult);
+            }
+        }
     }
 
     @Override
@@ -39,41 +45,25 @@ public class ListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Holder holder;
-        View view = convertView;
-
-        if(view == null){
+    public View getView(int position, View view, ViewGroup parent) {
+        if(view == null) {
             view = inflater.inflate(R.layout.list_item, null);
-            holder = new Holder();
-
-            holder.networkName = view.findViewById(R.id.txtWifiName);
-            holder.RSSI = view.findViewById(R.id.WiFiRSSI);
-            holder.Frequency = view.findViewById(R.id.WiFiFrequency);
-            holder.Distance = view.findViewById(R.id.WiFiDistance);
-            view.setTag(holder);
-
-        } else {
-            holder = (Holder)view.getTag();
         }
 
-        DecimalFormat f = new DecimalFormat("0.00");
+        TextView networkNameTV = view.findViewById(R.id.txtWifiName);
+        TextView RSSITV = view.findViewById(R.id.WiFiRSSI);
+        TextView frequencyTV = view.findViewById(R.id.WiFiFrequency);
+        TextView distanceTV = view.findViewById(R.id.WiFiDistance);
 
+        DecimalFormat f = new DecimalFormat("0.00");
         if(!wifiList.get(position).SSID.isEmpty()){
-            holder.networkName.setText(wifiList.get(position).SSID);
-            holder.RSSI.setText(String.valueOf(wifiList.get(position).level));
-            holder.Frequency.setText(String.valueOf(wifiList.get(position).frequency));
-            holder.Distance.setText(f.format(calculateDistance(Double.parseDouble(String.valueOf(wifiList.get(position).level)),Double.parseDouble(String.valueOf(wifiList.get(position).frequency)))));
+            networkNameTV.setText(wifiList.get(position).SSID);
+            RSSITV.setText(String.valueOf(wifiList.get(position).level));
+            frequencyTV.setText(String.valueOf(wifiList.get(position).frequency));
+            distanceTV.setText(f.format(calculateDistance(Double.parseDouble(String.valueOf(wifiList.get(position).level)),Double.parseDouble(String.valueOf(wifiList.get(position).frequency)))));
         }
 
         return view;
-    }
-
-    class Holder{
-        TextView networkName;
-        TextView RSSI;
-        TextView Frequency;
-        TextView Distance;
     }
 
     public double calculateDistance(double signalLevelInDb, double freqInMHz) {
