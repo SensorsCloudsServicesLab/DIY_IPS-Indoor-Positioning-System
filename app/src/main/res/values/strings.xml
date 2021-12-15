@@ -14,4 +14,5 @@
     <string name="right_arrow">▶</string>
     <string name="down_arrow">▼</string>
     <string name="zero">0</string>
+    <string name="angle_label">Angle From North</string>
 </resources>

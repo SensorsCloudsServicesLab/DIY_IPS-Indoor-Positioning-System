@@ -43,6 +43,31 @@
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/angle_label"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:labelFor="@id/angle"/>
+
+            <EditText
+                android:id="@+id/angle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:gravity="center"
+                android:autofillHints="ref_x"
+                android:inputType="numberDecimal"
+                android:text="@string/zero"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -55,7 +80,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/ref_x"
                     android:textSize="16sp"
-                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
                     android:labelFor="@id/reference_x"/>
 
                 <EditText
@@ -73,7 +99,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/reference_y"
                     android:textSize="16sp"
-                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorPrimary"
                     android:labelFor="@id/reference_y"/>
 
                 <EditText
@@ -132,28 +159,28 @@
 
             </GridLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/check_location_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
+                android:text="@string/refresh" />
 
-                <Button
-                    android:id="@+id/check_location_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="10dp"
-                    android:text="@string/refresh" />
-
-                <Button
-                    android:id="@+id/submit_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="10dp"
-                    android:text="@string/submit" />
-
-            </LinearLayout>
+            <Button
+                android:id="@+id/submit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:text="@string/submit" />
 
         </LinearLayout>
 
