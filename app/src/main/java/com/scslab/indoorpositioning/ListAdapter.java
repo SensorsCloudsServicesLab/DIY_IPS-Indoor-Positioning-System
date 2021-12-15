@@ -23,7 +23,7 @@ public class ListAdapter extends BaseAdapter {
         this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         for (ScanResult scanResult : wifiList) {
-            if (scanResult.SSID.contains("SCS_LAB")) {
+            if (scanResult.SSID.contains("SCSLAB_AP")) {
                 this.wifiList.add(scanResult);
             }
         }

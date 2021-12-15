@@ -50,29 +50,6 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/user_id_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:textColor="@color/colorPrimary"
-                    android:textStyle="bold"
-                    android:text="@string/user_id_title" />
-
-                <TextView
-                    android:id="@+id/user_id"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:gravity="end"
-                    android:text="12345" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
                     android:id="@+id/automatic_gps_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -113,14 +90,28 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/check_location_button"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:layout_marginEnd="40dp"
-                android:text="@string/refresh" />
+                android:orientation="vertical">
 
+                <Button
+                    android:id="@+id/check_location_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:text="@string/refresh" />
+
+                <Button
+                    android:id="@+id/fingerprint_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginEnd="40dp"
+                    android:text="@string/start_fingerprinting" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

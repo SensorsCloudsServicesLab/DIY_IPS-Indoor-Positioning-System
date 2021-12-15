@@ -1,6 +1,7 @@
 package com.scslab.indoorpositioning;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView latLongText;
     private ListView networkListView;
     private Button checkLocationButton;
+    private Button startFingerprintingButton;
 
     GoogleMap mGoogleMap;
 
@@ -51,25 +53,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         this.latLongText = findViewById(R.id.Latlng);
         this.networkListView = findViewById(R.id.networkListView);
         this.checkLocationButton = findViewById(R.id.check_location_button);
+        this.startFingerprintingButton = findViewById(R.id.fingerprint_button);
 
         //Initialisations
         initMap();
         initNetwork();
         initUI();
+        setupGPSLocationTracker();
 
-        getGPSLocation();
         getNetworkLocation();
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
         } else {
+            setupGPSLocationTracker();
             getNetworkLocation();
-            getGPSLocation();
         }
     }
 
     private void initUI() {
         checkLocationButton.setOnClickListener(v -> this.getNetworkLocation());
+        startFingerprintingButton.setOnClickListener(v -> {
+            Intent myIntent = new Intent(getApplicationContext(), FingerprintActivity.class);
+            startActivity(myIntent);
+        });
         networkListView.setOnItemClickListener((parent, view, position, id) -> {
 
         });
@@ -97,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @SuppressLint("MissingPermission")
-    private void getGPSLocation() {
+    private void setupGPSLocationTracker() {
         if (!checkOrRequestLocationPermissions()) {
             return;
         }
@@ -114,8 +121,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void gotoLocation(double latitude, double longitude) {
         LatLng latLng = new LatLng(latitude, longitude);
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-        mGoogleMap.moveCamera(cameraUpdate);
-        mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        if (mGoogleMap != null) {
+            mGoogleMap.moveCamera(cameraUpdate);
+            mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
     }
 
 

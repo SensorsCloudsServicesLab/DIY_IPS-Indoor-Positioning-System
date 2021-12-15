@@ -5,4 +5,13 @@
     <string name="user_id_title">User ID</string>
     <string name="detected_networks">Detected Networks</string>
     <string name="refresh">Refresh</string>
+    <string name="start_fingerprinting">Start Fingerprinting</string>
+    <string name="submit">Submit</string>
+    <string name="ref_x">Reference X</string>
+    <string name="reference_y">Reference Y</string>
+    <string name="up_arrow">▲</string>
+    <string name="left_arrow">◀</string>
+    <string name="right_arrow">▶</string>
+    <string name="down_arrow">▼</string>
+    <string name="zero">0</string>
 </resources>
