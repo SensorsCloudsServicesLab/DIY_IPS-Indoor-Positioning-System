@@ -22,6 +22,7 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
     private EditText reference_y_edit_text;
     private EditText angle_edit_text;
     private Button checkLocationButton;
+    private Button submitButton;
     private Button upArrowButton;
     private Button downArrowButton;
     private Button leftArrowButton;
@@ -32,13 +33,17 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
     private Sensor magnetometerSensor;
     private ListView networkListView;
     private WifiManager wifiManager;
+    private List<ScanResult> wifiList;
 
     private float[] mGravity;
     private float[] mGeomagnetic;
-    private float last_recorded_degrees_from_north = 0f;
 
     private final float x_increment = 0.25f;
     private final float y_increment = 0.25f;
+
+    private float current_degrees_from_north = 0f;
+
+    private DatabaseWrapper database = new DatabaseWrapper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,7 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
         //Find all views
         this.networkListView = findViewById(R.id.networkListView);
         this.checkLocationButton = findViewById(R.id.check_location_button);
+        this.submitButton = findViewById(R.id.submit_button);
         this.reference_x_edit_text = findViewById(R.id.reference_x);
         this.reference_y_edit_text = findViewById(R.id.reference_y);
         this.angle_edit_text = findViewById(R.id.angle);
@@ -67,6 +73,7 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
 
     private void initUI() {
         checkLocationButton.setOnClickListener(v -> this.getLocationData());
+        submitButton.setOnClickListener(v -> this.uploadFingerprintData());
         upArrowButton.setOnClickListener(v -> addFloatToEditText(reference_y_edit_text, y_increment));
         downArrowButton.setOnClickListener(v -> addFloatToEditText(reference_y_edit_text, -y_increment));
         leftArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, -x_increment));
@@ -95,17 +102,20 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
     private void getLocationData() {
         //WIFI Data
         wifiManager.startScan();
-        List<ScanResult> wifiList = wifiManager.getScanResults();
+        wifiList = wifiManager.getScanResults();
         ListAdapter listAdapter = new ListAdapter(getApplicationContext(), wifiList);
         networkListView.setAdapter(listAdapter);
 
         //Direction Data
-        angle_edit_text.setText(String.valueOf(last_recorded_degrees_from_north));
+        angle_edit_text.setText(String.valueOf(current_degrees_from_north));
     }
 
-
-
-
+    private void uploadFingerprintData() {
+        float ref_x = Float.parseFloat(reference_x_edit_text.getText().toString());
+        float ref_y = Float.parseFloat(reference_y_edit_text.getText().toString());
+        float angle = Float.parseFloat(angle_edit_text.getText().toString());
+        database.addFingerprintRecord(ref_x, ref_y, angle, wifiList);
+    }
 
     protected void onResume() {
         super.onResume();
@@ -117,8 +127,6 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
         super.onPause();
         sensorManager.unregisterListener(this);
     }
-
-
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -144,7 +152,7 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
                 SensorManager.getOrientation(R, orientation);
 
                 float angle = orientation[0];
-                last_recorded_degrees_from_north = -angle * 360 / (2 * 3.14159f);
+                current_degrees_from_north = -angle * 360 / (2 * 3.14159f);
             }
         }
     }
