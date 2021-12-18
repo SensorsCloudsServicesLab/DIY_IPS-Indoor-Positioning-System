@@ -39,19 +39,16 @@ public class DatabaseWrapper {
         RSSI_2GHZ: [
             {
                 SSID: "SCSLAB_AP_1_2GHZ",
-                MAC: "ab-cd-ef-gh-ij-kl",
                 RSSI : -50,
                 frequency: 2180
             },
             {
                 SSID: "SCSLAB_AP_2_2GHZ",
-                MAC: "ab-cd-ef-gh-ij-kl",
                 RSSI : -50,
                 frequency: 2190
             },
             {
                 SSID: "SCSLAB_AP_3_2GHZ",
-                MAC: "ab-cd-ef-gh-ij-kl",
                 RSSI : -50,
                 frequency: 2200
             }
@@ -59,19 +56,16 @@ public class DatabaseWrapper {
         RSSI_5GHZ: [
             {
                 SSID: "SCSLAB_AP_1_5GHZ",
-                MAC: "ab-cd-ef-gh-ij-kl",
                 RSSI : -50,
                 frequency: 5780
             },
             {
                 SSID: "SCSLAB_AP_2_5GHZ",
-                MAC: "ab-cd-ef-gh-ij-kl",
                 RSSI : -50,
                 frequency: 5790
             },
             {
                 SSID: "SCSLAB_AP_3_5GHZ",
-                MAC: "ab-cd-ef-gh-ij-kl",
                 RSSI : -50,
                 frequency: 5800
             }
@@ -91,7 +85,6 @@ public class DatabaseWrapper {
             if (!scanResult.SSID.isEmpty() && scanResult.SSID.contains("SCSLAB_AP")) {
                 Map<String, Object> rssi_record = new HashMap<>();
                 rssi_record.put("SSID", scanResult.SSID);
-                rssi_record.put("MAC", "ab-cd-ef-gh-ij-kl");
                 rssi_record.put("RSSI", scanResult.level);
                 rssi_record.put("frequency", scanResult.frequency);
 

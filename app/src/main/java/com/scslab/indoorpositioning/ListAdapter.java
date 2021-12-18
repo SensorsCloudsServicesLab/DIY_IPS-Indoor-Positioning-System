@@ -53,21 +53,13 @@ public class ListAdapter extends BaseAdapter {
         TextView networkNameTV = view.findViewById(R.id.txtWifiName);
         TextView RSSITV = view.findViewById(R.id.WiFiRSSI);
         TextView frequencyTV = view.findViewById(R.id.WiFiFrequency);
-        TextView distanceTV = view.findViewById(R.id.WiFiDistance);
 
-        DecimalFormat f = new DecimalFormat("0.00");
         if(!wifiList.get(position).SSID.isEmpty()){
             networkNameTV.setText(wifiList.get(position).SSID);
             RSSITV.setText(String.valueOf(wifiList.get(position).level));
             frequencyTV.setText(String.valueOf(wifiList.get(position).frequency));
-            distanceTV.setText(f.format(calculateDistance(Double.parseDouble(String.valueOf(wifiList.get(position).level)),Double.parseDouble(String.valueOf(wifiList.get(position).frequency)))));
         }
 
         return view;
-    }
-
-    public double calculateDistance(double signalLevelInDb, double freqInMHz) {
-        double exp = (27.55 - (20 * Math.log10(freqInMHz)) + Math.abs(signalLevelInDb)) / 20.0;
-        return Math.pow(10.0, exp);
     }
 }

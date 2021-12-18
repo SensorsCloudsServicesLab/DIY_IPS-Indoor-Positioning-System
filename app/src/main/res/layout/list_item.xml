@@ -6,15 +6,15 @@
     android:weightSum="1">
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="0.25"
-        android:gravity="center"
+        android:layout_weight="0.5"
+        android:gravity="start"
         android:id="@+id/txtWifiName"
         />
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0.25"
         android:gravity="center"
@@ -22,19 +22,11 @@
         />
 
     <TextView
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="0.25"
-        android:gravity="center"
+        android:gravity="end"
         android:id="@+id/WiFiFrequency"
-        />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.25"
-        android:gravity="center"
-        android:id="@+id/WiFiDistance"
         />
 
 
