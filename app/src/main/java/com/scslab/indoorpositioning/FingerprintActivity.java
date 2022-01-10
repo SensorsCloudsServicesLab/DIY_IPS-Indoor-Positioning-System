@@ -38,8 +38,8 @@ public class FingerprintActivity extends AppCompatActivity implements SensorEven
     private float[] mGravity;
     private float[] mGeomagnetic;
 
-    private final float x_increment = 0.25f;
-    private final float y_increment = 0.25f;
+    private final float x_increment = 0.5f;
+    private final float y_increment = 0.5f;
 
     private float current_degrees_from_north = 0f;
 
