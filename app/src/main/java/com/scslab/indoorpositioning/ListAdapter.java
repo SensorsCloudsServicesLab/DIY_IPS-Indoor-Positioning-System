@@ -27,6 +27,12 @@ public class ListAdapter extends BaseAdapter {
                 this.wifiList.add(scanResult);
             }
         }
+
+        for (ScanResult scanResult : wifiList) {
+            if (!scanResult.SSID.contains("SCSLAB_AP")) {
+                this.wifiList.add(scanResult);
+            }
+        }
     }
 
     @Override
