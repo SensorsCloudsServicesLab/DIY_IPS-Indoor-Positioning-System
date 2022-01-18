@@ -27,18 +27,18 @@ class RoomSimulator:
         return np.random.normal(0, self.noise_stddev)
 
     '''
-    results = [
-        { (AP1)
+    results = {
+        AP1: {
             (0,0) : [0,1,2,3,1,2,0,1],
             (0,1) : [0,1,2,3,1,2,0,1],
             ...
         },
-        { (AP2)
+        AP2: {
             (0,0) : [0,1,2,3,1,2,0,1],
             (0,1) : [0,1,2,3,1,2,0,1],
             ...
         },
-    ]
+    }
     '''
     def simulate(self):
         for access_point in self.access_points:

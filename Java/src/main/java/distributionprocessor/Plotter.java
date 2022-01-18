@@ -1,4 +1,4 @@
-package demo;
+package distributionprocessor;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
