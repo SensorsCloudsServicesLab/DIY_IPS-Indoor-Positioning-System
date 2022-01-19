@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
-public class FingerprintActivity extends AppCompatActivity implements SensorEventListener {
+public class CollectRSSIDataActivity extends AppCompatActivity implements SensorEventListener {
 
     private EditText reference_x_edit_text;
     private EditText reference_y_edit_text;

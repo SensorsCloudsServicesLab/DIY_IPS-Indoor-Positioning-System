@@ -38,45 +38,35 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-<!--                <Button-->
-<!--                    android:id="@+id/check_location_button"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginStart="40dp"-->
-<!--                    android:layout_marginEnd="40dp"-->
-<!--                    android:text="@string/refresh" />-->
+                <TextView
+                    android:id="@+id/detected_networks_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold"
+                    android:text="@string/detected_networks" />
+
+                <ListView
+                    android:id="@+id/networkListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:layout_below="@+id/Latlng"
+                    android:layout_marginTop="8dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/collect_rsi_button"
+                    android:id="@+id/check_location_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="40dp"
                     android:layout_marginEnd="40dp"
-                    android:text="@string/collect_rssi_text" />
-
-                <Button
-                    android:id="@+id/process_distributions_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginEnd="40dp"
-                    android:text="@string/process_distributions_text" />
-
-                <Button
-                    android:id="@+id/process_regression_data_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginEnd="40dp"
-                    android:text="@string/process_regression_text" />
-
-                <Button
-                    android:id="@+id/indoor_localisation_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginEnd="40dp"
-                    android:text="@string/indoor_localisation_text" />
+                    android:text="@string/refresh" />
 
             </LinearLayout>
 

@@ -5,7 +5,10 @@
     <string name="user_id_title">User ID</string>
     <string name="detected_networks">Detected Networks</string>
     <string name="refresh">Refresh</string>
-    <string name="start_fingerprinting">Start Fingerprinting</string>
+    <string name="collect_rssi_text">Collect RSSI Data</string>
+    <string name="process_distributions_text">Process Distributions Data</string>
+    <string name="process_regression_text">Process Regression Data</string>
+    <string name="indoor_localisation_text">Indoor Localisation</string>
     <string name="submit">Submit</string>
     <string name="ref_x">Reference X</string>
     <string name="reference_y">Reference Y</string>

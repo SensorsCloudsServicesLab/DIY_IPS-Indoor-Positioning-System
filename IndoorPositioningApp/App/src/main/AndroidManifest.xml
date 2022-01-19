@@ -31,7 +31,15 @@
         </activity>
 
         <activity
-            android:name=".FingerprintActivity"
+            android:name=".CollectRSSIDataActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".MainActivity"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
+
+        <activity
+            android:name=".IndoorLocalisationActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity"
