@@ -99,7 +99,7 @@ public class DatabaseWrapper {
         record.put("RSSI_2GHZ", rssi_2GHz_list);
         record.put("RSSI_5GHZ", rssi_5GHz_list);
 
-        db.collection("fingerprint_records")
+        db.collection("rssi_records")
                 .add(record)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
