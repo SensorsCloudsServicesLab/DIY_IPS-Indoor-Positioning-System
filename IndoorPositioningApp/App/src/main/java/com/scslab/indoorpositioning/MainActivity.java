@@ -66,12 +66,7 @@ public class MainActivity extends AppCompatActivity {
             List<Map<String, Map<Position, List<Double>>>> RSSIDistributions = DistributionProcessor.processDistributions(RSSIData);
 
             Toast.makeText(MainActivity.this, "Uploading RSSI Distributions...", Toast.LENGTH_SHORT).show();
-            boolean success = DistributionProcessor.uploadDistributions(this, RSSIDistributions);
-            if (success) {
-                Toast.makeText(MainActivity.this, "Upload Successful.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(MainActivity.this, "Upload Failed.", Toast.LENGTH_SHORT).show();
-            }
+            DistributionProcessor.uploadDistributions(this, RSSIDistributions);
         });
     }
 }

@@ -50,22 +50,22 @@ class DistributionProcessor {
     }
 
     /*
-    {
-        position_x: 0
-        position_y: 0
-        distribution_parameters: {
-            mu: 3
-            sigma: 3
-        }
-    }
+        collection: rssi_distributions -> north/east/south/west -> distributions -> [
+            "(0,0)" : {
+                position_x: 0
+                position_y: 0
+                distribution_parameters: {
+                    mu: 3
+                    sigma: 3
+                }
+            }, ...
+        ]
      */
-    public static boolean uploadDistributions(Activity activity, List<Map<String, Map<Position, List<Double>>>> RSSIDirectionalDistributions) {
+    public static void uploadDistributions(Activity activity, List<Map<String, Map<Position, List<Double>>>> RSSIDirectionalDistributions) {
         Log.d("Riccardo", RSSIDirectionalDistributions.toString());
 
         DatabaseWrapper db = new DatabaseWrapper(activity);
-        db.batchedWrite("rssi_distributions", data, onCompleteListener);
-
-        return false;
+        db.uploadDistributionCollection(RSSIDirectionalDistributions);
     }
 
     public static double[] prepareDataForDistribution(List<Double> list) {
@@ -77,7 +77,6 @@ class DistributionProcessor {
     }
 
     //BEGIN TEST CODE
-
     public static void testFitDistribution() {
         double[] data = new double[] {
                 69, 67, 68, 68, 67, 68, 68, 66, 70, 68, 71, 69, 69, 72, 70, 69, 68, 72, 70, 69, 67, 70, 72, 71, 67, 68, 67, 72, 67, 70, 71, 71, 69, 67, 68, 67, 70, 69, 67, 69, 68, 69, 69, 68, 67, 68, 68, 70, 70, 70, 71, 69, 69, 73, 68, 69, 69, 67, 70, 69, 68, 67, 70, 68, 67, 68, 66, 68, 70, 67, 68, 69, 67, 69, 70, 69, 69, 70, 69, 68, 67, 75, 70, 67, 71, 67, 68, 69, 67, 70, 69, 67, 71, 67, 68, 70, 69, 68, 69, 69

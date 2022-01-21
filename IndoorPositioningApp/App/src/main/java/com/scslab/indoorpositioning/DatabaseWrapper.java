@@ -7,15 +7,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -29,6 +25,13 @@ public class DatabaseWrapper {
     public static int DIRECTION_EAST = 1;
     public static int DIRECTION_SOUTH = 2;
     public static int DIRECTION_WEST = 3;
+
+    public static String[] DIRECTION_NAMES = new String[] {
+         "north",
+         "east",
+         "south",
+         "west"
+    };
 
     private static String TAG = "Database";
 
@@ -101,26 +104,20 @@ public class DatabaseWrapper {
 
         db.collection("rssi_records")
                 .add(record)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Activity activity = activityWeakReference.get();
-                        if (activity != null && !activity.isFinishing()) {
-                            Toast.makeText(activity, "Recorded with ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
-                        }
-                        Log.d(TAG, "Recorded with ID: " + documentReference.getId());
+                .addOnSuccessListener((DocumentReference documentReference) -> {
+                    Activity activity = activityWeakReference.get();
+                    if (activity != null && !activity.isFinishing()) {
+                        Toast.makeText(activity, "Recorded with ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
                     }
+                    Log.d(TAG, "Recorded with ID: " + documentReference.getId());
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Activity activity = activityWeakReference.get();
-                        if (activity != null && !activity.isFinishing()) {
-                            Toast.makeText(activity, "Error adding record", Toast.LENGTH_SHORT).show();
-                        }
-                        Log.d(TAG, e.getMessage());
-                        e.printStackTrace();
+                .addOnFailureListener((@NonNull Exception e) -> {
+                    Activity activity = activityWeakReference.get();
+                    if (activity != null && !activity.isFinishing()) {
+                        Toast.makeText(activity, "Error adding record", Toast.LENGTH_SHORT).show();
                     }
+                    Log.d(TAG, e.getMessage());
+                    e.printStackTrace();
                 });
     }
 
@@ -160,7 +157,7 @@ public class DatabaseWrapper {
                             } else if (angle > 135 && angle <= 180 || angle <= -135 && angle >= -180) {
                                 direction = DIRECTION_SOUTH;
                             } else if (angle <= -45 && angle > -135) {
-                                direction = DIRECTION_EAST;
+                                direction = DIRECTION_WEST;
                             }
                         }
                         Map<String, Map<Position, List<Double>>> relevantDataMap = parsedDirectionalRSSIData.get(direction);
@@ -200,6 +197,85 @@ public class DatabaseWrapper {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
             });
+    }
+
+    public void uploadDistributionCollection(List<Map<String, Map<Position, List<Double>>>> rssiDirectionalDistributions) {
+        db.collection("rssi_distributions").get().addOnCompleteListener((task) -> {
+            if (!task.isSuccessful()) {
+                Log.d(TAG, "Error accessing distributions collection: ", task.getException());
+                return;
+            }
+
+            int size = task.getResult().size();
+            if (size != 0) {
+                Log.d(TAG, "Collection already Set up");
+                return;
+            }
+
+            WriteBatch batch = db.batch();
+
+            List<DocumentReference> directionDocumentReferences = new ArrayList<>();
+            directionDocumentReferences.add(db.collection("rssi_distributions").document("north"));
+            directionDocumentReferences.add(db.collection("rssi_distributions").document("east"));
+            directionDocumentReferences.add(db.collection("rssi_distributions").document("south"));
+            directionDocumentReferences.add(db.collection("rssi_distributions").document("west"));
+
+            for (DocumentReference directionReference : directionDocumentReferences) {
+                batch.set(directionReference, new HashMap<String, Object>());
+
+                for (String accessPointName : rssiDirectionalDistributions.get(0).keySet()) {
+                    DocumentReference accessPointReference = directionReference.collection("access_points").document(accessPointName);
+                    batch.set(accessPointReference, new HashMap<String, Object>());
+                }
+            }
+
+            batch.commit().addOnCompleteListener((batchTask) -> {
+                if (!batchTask.isSuccessful()) {
+                    Log.d(TAG, "Failed to initialise distribution database");
+                    return;
+                }
+
+                //Upload all the main data
+                int index = 0;
+                for (Map<String, Map<Position, List<Double>>> directionData : rssiDirectionalDistributions) {
+                    index++;
+                    for (String accessPointName : directionData.keySet()) {
+                        Map<Position, List<Double>> accessPointData = directionData.get(accessPointName);
+
+                        //Create a batch for each access point data in each direction. Note: 500 records max per batch
+                        WriteBatch dataBatch = db.batch();
+
+                        for (Position position : accessPointData.keySet()) {
+                            List<Double> distributionParameters = accessPointData.get(position);
+                            Double mu = distributionParameters.get(0);
+                            Double sigma = distributionParameters.get(1);
+
+                            Map<String, Object> positionDistribution = new HashMap<>();
+                            positionDistribution.put("reference_x", position.x);
+                            positionDistribution.put("reference_y", position.y);
+                            positionDistribution.put("distribution_param_mu", mu);
+                            positionDistribution.put("distribution_param_sigma", sigma);
+
+                            DocumentReference referencePointDistributionReference = db
+                                    .collection("rssi_distributions")
+                                    .document(DatabaseWrapper.DIRECTION_NAMES[index])
+                                    .collection("access_points")
+                                    .document(accessPointName)
+                                    .collection("reference_points")
+                                    .document("(" + position.x + "," + position.y + ")");
+
+                            dataBatch.set(referencePointDistributionReference, positionDistribution);
+                        }
+
+                        dataBatch.commit().addOnCompleteListener((dataBatchTask) -> {
+                            if (!dataBatchTask.isSuccessful()) {
+                                Log.d(TAG, "Failed to upload direction distributions");
+                            }
+                        });
+                    }
+                }
+            });
+        });
     }
 
     @FunctionalInterface
