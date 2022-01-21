@@ -8,6 +8,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.widget.Button;
+import android.widget.Toast;
+
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,8 +42,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         processDistributionsButton.setOnClickListener(v -> {
-//            Intent myIntent = new Intent(getApplicationContext(), IndoorLocalisationActivity.class);
-//            startActivity(myIntent);
+            processDataDistributions();
         });
 
         processRegressionButton.setOnClickListener(v -> {
@@ -52,6 +55,23 @@ public class MainActivity extends AppCompatActivity {
         indoorLocalisationButton.setOnClickListener(v -> {
             Intent myIntent = new Intent(getApplicationContext(), IndoorLocalisationActivity.class);
             startActivity(myIntent);
+        });
+    }
+
+    public void processDataDistributions() {
+        Toast.makeText(MainActivity.this, "Retrieving RSSI Data from database...", Toast.LENGTH_SHORT).show();
+        DistributionProcessor.getDataFromDatabase(this, false, (List<Map<String, Map<Position, List<Double>>>> RSSIData) -> {
+
+            Toast.makeText(MainActivity.this, "Processing RSSI Distributions...", Toast.LENGTH_SHORT).show();
+            List<Map<String, Map<Position, List<Double>>>> RSSIDistributions = DistributionProcessor.processDistributions(RSSIData);
+
+            Toast.makeText(MainActivity.this, "Uploading RSSI Distributions...", Toast.LENGTH_SHORT).show();
+            boolean success = DistributionProcessor.uploadDistributions(this, RSSIDistributions);
+            if (success) {
+                Toast.makeText(MainActivity.this, "Upload Successful.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Upload Failed.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }
