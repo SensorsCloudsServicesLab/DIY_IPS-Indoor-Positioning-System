@@ -238,7 +238,6 @@ public class DatabaseWrapper {
                 //Upload all the main data
                 int index = 0;
                 for (Map<String, Map<Position, List<Double>>> directionData : rssiDirectionalDistributions) {
-                    index++;
                     for (String accessPointName : directionData.keySet()) {
                         Map<Position, List<Double>> accessPointData = directionData.get(accessPointName);
 
@@ -273,6 +272,7 @@ public class DatabaseWrapper {
                             }
                         });
                     }
+                    index++;
                 }
             });
         });

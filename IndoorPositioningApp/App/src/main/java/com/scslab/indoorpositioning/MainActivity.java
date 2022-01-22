@@ -1,6 +1,5 @@
 package com.scslab.indoorpositioning;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void processDataDistributions() {
         Toast.makeText(MainActivity.this, "Retrieving RSSI Data from database...", Toast.LENGTH_SHORT).show();
-        DistributionProcessor.getDataFromDatabase(this, false, (List<Map<String, Map<Position, List<Double>>>> RSSIData) -> {
+        DistributionProcessor.getDataFromDatabase(this, true, (List<Map<String, Map<Position, List<Double>>>> RSSIData) -> {
 
             Toast.makeText(MainActivity.this, "Processing RSSI Distributions...", Toast.LENGTH_SHORT).show();
             List<Map<String, Map<Position, List<Double>>>> RSSIDistributions = DistributionProcessor.processDistributions(RSSIData);
