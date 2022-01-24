@@ -1,10 +1,6 @@
 package com.scslab.indoorpositioning;
 
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -16,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
-public class CollectRSSIDataActivity extends AppCompatActivity implements SensorEventListener {
+public class CollectRSSIDataActivity extends AppCompatActivity {
 
     private EditText reference_x_edit_text;
     private EditText reference_y_edit_text;
@@ -28,20 +24,13 @@ public class CollectRSSIDataActivity extends AppCompatActivity implements Sensor
     private Button leftArrowButton;
     private Button rightArrowButton;
 
-    private SensorManager sensorManager;
-    private Sensor accelerometerSensor;
-    private Sensor magnetometerSensor;
     private ListView networkListView;
     private WifiManager wifiManager;
     private List<ScanResult> wifiList;
-
-    private float[] mGravity;
-    private float[] mGeomagnetic;
+    private DirectionManager directionManager;
 
     private final float x_increment = 0.5f;
     private final float y_increment = 0.5f;
-
-    private float current_degrees_from_north = 0f;
 
     private DatabaseWrapper database = new DatabaseWrapper(this);
 
@@ -65,7 +54,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity implements Sensor
         //Initialisations
         initUI();
         initNetwork();
-        initSensors();
+        this.directionManager = new DirectionManager(this);
 
         //Update the network info
         getLocationData();
@@ -78,12 +67,6 @@ public class CollectRSSIDataActivity extends AppCompatActivity implements Sensor
         downArrowButton.setOnClickListener(v -> addFloatToEditText(reference_y_edit_text, -y_increment));
         leftArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, -x_increment));
         rightArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, x_increment));
-    }
-
-    private void initSensors() {
-        sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
     private void addFloatToEditText(EditText edittext, Float value) {
@@ -107,7 +90,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity implements Sensor
         networkListView.setAdapter(listAdapter);
 
         //Direction Data
-        angle_edit_text.setText(String.valueOf(current_degrees_from_north));
+        angle_edit_text.setText(String.valueOf(directionManager.getCurrentDegreesFromNorth()));
     }
 
     private void uploadFingerprintData() {
@@ -119,42 +102,12 @@ public class CollectRSSIDataActivity extends AppCompatActivity implements Sensor
 
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(this, magnetometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        directionManager.onResume();
     }
 
     protected void onPause() {
         super.onPause();
-        sensorManager.unregisterListener(this);
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
-            mGravity = event.values;
-
-        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
-            mGeomagnetic = event.values;
-
-        if (mGravity != null && mGeomagnetic != null) {
-            float R[] = new float[9];
-            float I[] = new float[9];
-
-            if (SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic)) {
-
-                // orientation contains azimuth, pitch and roll
-                float[] orientation = new float[3];
-                SensorManager.getOrientation(R, orientation);
-
-                float angle = orientation[0];
-                current_degrees_from_north = -angle * 360 / (2 * 3.14159f);
-            }
-        }
+        directionManager.onPause();
     }
 }
 

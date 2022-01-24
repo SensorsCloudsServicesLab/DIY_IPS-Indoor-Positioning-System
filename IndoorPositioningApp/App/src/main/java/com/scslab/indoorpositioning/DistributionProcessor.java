@@ -92,9 +92,8 @@ class DistributionProcessor {
 
             //Write this JSON to a file
             String distributionData = RSSIDirectionalDistributionsJSON.toString();
-            File path = activity.getApplicationContext().getFilesDir();
+            File path = activity.getApplicationContext().getExternalFilesDir(null);
             File distributionDataFile = new File(path, "distributions.json");
-            Log.d("Riccardo", distributionDataFile.getAbsolutePath());
 
             FileOutputStream stream = new FileOutputStream(distributionDataFile);
             stream.write(distributionData.getBytes());

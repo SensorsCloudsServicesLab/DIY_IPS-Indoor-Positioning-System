@@ -11,7 +11,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.WriteBatch;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -148,18 +147,7 @@ public class DatabaseWrapper {
                         Double angle = (Double) data.get("angle");
 
                         //Find the map corresponding to the observation's direction
-                        int direction = DIRECTION_NORTH;
-                        if (angle != null) {
-                            if (angle > -45 && angle <= 45) {
-                                direction = DIRECTION_NORTH;
-                            } else if (angle > 45 && angle <= 135) {
-                                direction = DIRECTION_EAST;
-                            } else if (angle > 135 && angle <= 180 || angle <= -135 && angle >= -180) {
-                                direction = DIRECTION_SOUTH;
-                            } else if (angle <= -45 && angle > -135) {
-                                direction = DIRECTION_WEST;
-                            }
-                        }
+                        int direction = Helpers.getDirection(angle);
                         Map<String, Map<Position, List<Double>>> relevantDataMap = parsedDirectionalRSSIData.get(direction);
 
                         //Add the data to this map:

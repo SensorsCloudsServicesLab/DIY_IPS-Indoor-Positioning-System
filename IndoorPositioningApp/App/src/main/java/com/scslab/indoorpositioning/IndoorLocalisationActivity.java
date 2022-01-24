@@ -30,13 +30,12 @@ import smile.stat.distribution.LogNormalDistribution;
 
 public class IndoorLocalisationActivity extends AppCompatActivity {
 
-    private ListView networkListView;
     private Button checkLocationButton;
 
-    WifiManager wifiManager;
-    ListAdapter listAdapter;
-
-    List<ScanResult> wifiList;
+    private ListView networkListView;
+    private WifiManager wifiManager;
+    private List<ScanResult> wifiList;
+    private DirectionManager directionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +49,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
         //Initialisations
         initNetwork();
         initUI();
-
-        getNetworkLocation();
-
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-        } else {
-            getNetworkLocation();
-        }
+        this.directionManager = new DirectionManager(this);
     }
 
     private void initUI() {
@@ -72,17 +64,39 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
     }
 
     private void getNetworkLocation() {
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            return;
+        }
+
         wifiManager.startScan();
         wifiList = wifiManager.getScanResults();
-        listAdapter = new ListAdapter(getApplicationContext(), wifiList);
+        ListAdapter listAdapter = new ListAdapter(getApplicationContext(), wifiList);
         networkListView.setAdapter(listAdapter);
+
+        getLocation();
+    }
+
+    private void getLocation() {
+        //look up the closest x and y directions
+        float degreesFromNorth = directionManager.getCurrentDegreesFromNorth();
+        int[] directions = Helpers.getClosestDirections(degreesFromNorth);
+
+        //Get the associated maps
+        Map<String, Map<Position, LogNormalDistribution>> xDirectionData = importDistributions(directions[0]);
+        //TODO: Process this one, then unset xDirectionData. may also need to do this on a different thread + multithreads maybe
+
+        Map<String, Map<Position, LogNormalDistribution>> yDirectionData = importDistributions(directions[1]);
+        //TODO:  Process this one, then unset yDirectionData. may also need to do this on a different thread + multithreads maybe
+
+        Log.d("Riccardo", xDirectionData.toString());
     }
 
     public Map<String, Map<Position, LogNormalDistribution>> importDistributions(int direction) {
         try {
             //Read data from file
             String directionName = DatabaseWrapper.DIRECTION_NAMES[direction];
-            File path = getApplicationContext().getFilesDir();
+            File path = getApplicationContext().getExternalFilesDir(null);
             File distributionDataFile = new File(path, directionName+"_distributions.json");
 
             int length = (int) distributionDataFile.length();
@@ -107,8 +121,8 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
                     );
 
                     LogNormalDistribution distribution = new LogNormalDistribution(
-                        positionDistributionJSON.getDouble("mu"),
-                        positionDistributionJSON.getDouble("sigma")
+                        Math.max(positionDistributionJSON.getDouble("mu"), 0),
+                        Math.max(positionDistributionJSON.getDouble("sigma"), 0.01)
                     );
 
                     accessPointData.put(position, distribution);
@@ -125,4 +139,15 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
 
         return null;
     }
+
+    protected void onResume() {
+        super.onResume();
+        directionManager.onResume();
+    }
+
+    protected void onPause() {
+        super.onPause();
+        directionManager.onPause();
+    }
+
 }
