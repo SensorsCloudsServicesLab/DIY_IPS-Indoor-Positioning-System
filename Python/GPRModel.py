@@ -6,15 +6,13 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
 
-from RoomSimulator import RoomSimulator
-
 class GPRModel:
 
     def __init__(self, outputResolution):
         self.outputResolution = outputResolution
         self.trained = False
 
-        kernel = RBF([5,5], (2e-1, 2e1))
+        kernel = RBF([5,5], (1e-1, 1e1))
         self.gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=15)
 
     def train(self, coords, values):
