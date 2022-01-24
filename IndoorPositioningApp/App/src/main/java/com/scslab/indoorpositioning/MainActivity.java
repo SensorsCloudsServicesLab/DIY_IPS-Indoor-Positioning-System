@@ -45,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         processRegressionButton.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Please run the python script in the repository to continue.")
-                .setPositiveButton("OK", null);
-            builder.show();
+            new AlertDialog.Builder(this)
+                .setMessage("Please run the python script in the repository to continue.")
+                .setPositiveButton("OK", null)
+                .show();
         });
 
         indoorLocalisationButton.setOnClickListener(v -> {
@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Processing RSSI Distributions...", Toast.LENGTH_SHORT).show();
             List<Map<String, Map<Position, List<Double>>>> RSSIDistributions = DistributionProcessor.processDistributions(RSSIData);
 
-            Toast.makeText(MainActivity.this, "Uploading RSSI Distributions...", Toast.LENGTH_SHORT).show();
-            DistributionProcessor.uploadDistributions(this, RSSIDistributions);
+            Toast.makeText(MainActivity.this, "Saving RSSI Distributions...", Toast.LENGTH_SHORT).show();
+            DistributionProcessor.saveDataJSON(this, RSSIDistributions);
         });
     }
 }

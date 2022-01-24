@@ -3,6 +3,13 @@ package com.scslab.indoorpositioning;
 import android.app.Activity;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +23,7 @@ class DistributionProcessor {
         if (should_simulate_data) {
             RoomSimulator simulator = new RoomSimulator(8, 8, 100);
             onCompleteListener.onComplete(simulator.simulateForAllDirections());
+            return;
         }
 
         DatabaseWrapper db = new DatabaseWrapper(activity);
@@ -49,25 +57,6 @@ class DistributionProcessor {
         return directionalDistributionData;
     }
 
-    /*
-        collection: rssi_distributions -> north/east/south/west -> distributions -> [
-            "(0,0)" : {
-                position_x: 0
-                position_y: 0
-                distribution_parameters: {
-                    mu: 3
-                    sigma: 3
-                }
-            }, ...
-        ]
-     */
-    public static void uploadDistributions(Activity activity, List<Map<String, Map<Position, List<Double>>>> RSSIDirectionalDistributions) {
-        Log.d("Riccardo", RSSIDirectionalDistributions.toString());
-
-        DatabaseWrapper db = new DatabaseWrapper(activity);
-        db.uploadDistributionCollection(RSSIDirectionalDistributions);
-    }
-
     public static double[] prepareDataForDistribution(List<Double> list) {
         double[] array = new double[list.size()];
         for (int i = 0; i < list.size(); i++) {
@@ -76,33 +65,45 @@ class DistributionProcessor {
         return array;
     }
 
-    //BEGIN TEST CODE
-    public static void testFitDistribution() {
-        double[] data = new double[] {
-                69, 67, 68, 68, 67, 68, 68, 66, 70, 68, 71, 69, 69, 72, 70, 69, 68, 72, 70, 69, 67, 70, 72, 71, 67, 68, 67, 72, 67, 70, 71, 71, 69, 67, 68, 67, 70, 69, 67, 69, 68, 69, 69, 68, 67, 68, 68, 70, 70, 70, 71, 69, 69, 73, 68, 69, 69, 67, 70, 69, 68, 67, 70, 68, 67, 68, 66, 68, 70, 67, 68, 69, 67, 69, 70, 69, 69, 70, 69, 68, 67, 75, 70, 67, 71, 67, 68, 69, 67, 70, 69, 67, 71, 67, 68, 70, 69, 68, 69, 69
-        };
+    public static void saveDataJSON(Activity activity, List<Map<String, Map<Position, List<Double>>>> RSSIDirectionalDistributions) {
+        try {
+            JSONObject RSSIDirectionalDistributionsJSON = new JSONObject();
+            int index = 0;
+            for (Map<String, Map<Position, List<Double>>> directionaldistributionData : RSSIDirectionalDistributions) {
+                JSONObject directionalDistributionDataJSON = new JSONObject();
+                for (String accessPointName : directionaldistributionData.keySet()) {
+                    Map<Position, List<Double>> accessPointData = directionaldistributionData.get(accessPointName);
+                    JSONArray positionDataJSON = new JSONArray();
+                    for (Position position : accessPointData.keySet()) {
+                        List<Double> distributionData = accessPointData.get(position);
+                        JSONObject distributionJSON = new JSONObject();
+                        distributionJSON.put("ref_x", position.x);
+                        distributionJSON.put("ref_y", position.y);
+                        distributionJSON.put("mu", distributionData.get(0));
+                        distributionJSON.put("sigma", distributionData.get(1));
+                        positionDataJSON.put(distributionJSON);
+                    }
+                    directionalDistributionDataJSON.put(accessPointName, positionDataJSON);
+                }
 
-        LogNormalDistribution dist = LogNormalDistribution.fit(data);
-        dist = new LogNormalDistribution(dist.mu, dist.sigma);
-        System.out.println(String.valueOf(dist.mean()));
-        System.out.println(String.valueOf(dist.variance()));
-        System.out.println(String.valueOf(dist.p(65)));
-        System.out.println(String.valueOf(dist.length()));
-        plotDistribution(dist);
-    }
+                RSSIDirectionalDistributionsJSON.put(DatabaseWrapper.DIRECTION_NAMES[index], directionalDistributionDataJSON);
+                index++;
+            }
 
-    public static void plotDistribution(LogNormalDistribution distribution) {
-        double[] x = new double[200];
-        double[] y = new double[200];
+            //Write this JSON to a file
+            String distributionData = RSSIDirectionalDistributionsJSON.toString();
+            File path = activity.getApplicationContext().getFilesDir();
+            File distributionDataFile = new File(path, "distributions.json");
+            Log.d("Riccardo", distributionDataFile.getAbsolutePath());
 
-        for (int i = 0; i < 200; i++) {
-            x[i] = distribution.mean() + (((double)i)/10);
-            y[i] = distribution.p(x[i]);
+            FileOutputStream stream = new FileOutputStream(distributionDataFile);
+            stream.write(distributionData.getBytes());
+            stream.close();
+
+        } catch (JSONException e) {
+            Log.d("Riccardo | JSONException", e.getMessage());
+        } catch (IOException e) {
+            Log.d("Riccardo | IOException", e.getMessage());
         }
-
-//        Plotter fig = new Plotter();
-//        fig.plot(x, y, "-r", 2.0f, "AAPL");
-//        fig.RenderPlot();
-//        fig.saveas("MyPlot.jpeg",640,480);
     }
 }
