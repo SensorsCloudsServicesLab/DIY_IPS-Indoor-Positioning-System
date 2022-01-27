@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -36,6 +37,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
     private WifiManager wifiManager;
     private List<ScanResult> wifiList;
     private DirectionManager directionManager;
+    private final Map<String, Map<String, RoomMatrix<LogNormalDistribution>>> distributions = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +51,27 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
         //Initialisations
         initNetwork();
         initUI();
+        initDistributions();
         this.directionManager = new DirectionManager(this);
     }
 
     private void initUI() {
         checkLocationButton.setOnClickListener(v -> this.getNetworkLocation());
-        networkListView.setOnItemClickListener((parent, view, position, id) -> {
-
-        });
     }
 
     private void initNetwork() {
         this.wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+    }
+
+    private void initDistributions() {
+        new Thread(() -> {
+            runOnUiThread(() -> {Toast.makeText(IndoorLocalisationActivity.this, "Importing Data...", Toast.LENGTH_SHORT).show();});
+            distributions.put(DatabaseWrapper.DIRECTION_NAMES[DatabaseWrapper.DIRECTION_NORTH], importDistributions(DatabaseWrapper.DIRECTION_NORTH));
+            distributions.put(DatabaseWrapper.DIRECTION_NAMES[DatabaseWrapper.DIRECTION_EAST], importDistributions(DatabaseWrapper.DIRECTION_EAST));
+            distributions.put(DatabaseWrapper.DIRECTION_NAMES[DatabaseWrapper.DIRECTION_SOUTH], importDistributions(DatabaseWrapper.DIRECTION_SOUTH));
+            distributions.put(DatabaseWrapper.DIRECTION_NAMES[DatabaseWrapper.DIRECTION_WEST], importDistributions(DatabaseWrapper.DIRECTION_WEST));
+            runOnUiThread(() -> {Toast.makeText(IndoorLocalisationActivity.this, "Init Complete.", Toast.LENGTH_SHORT).show();});
+        }).start();
     }
 
     private void getNetworkLocation() {
@@ -78,21 +89,50 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
     }
 
     private void getLocation() {
-        //look up the closest x and y directions
+        //Look up the closest x and y directions
         float degreesFromNorth = directionManager.getCurrentDegreesFromNorth();
         int[] directions = Helpers.getClosestDirections(degreesFromNorth);
 
+        //Read RSSI values
+        RoomSimulator sim = new RoomSimulator(8, 8, 100);
+        Map<String, Double> rssiValues = sim.sampleRSSI(new Position(3, 4));
+
         //Get the associated maps
-        Map<String, Map<Position, LogNormalDistribution>> xDirectionData = importDistributions(directions[0]);
-        //TODO: Process this one, then unset xDirectionData. may also need to do this on a different thread + multithreads maybe
+        Map<String, RoomMatrix<LogNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
+        Map<String, RoomMatrix<LogNormalDistribution>> yDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[1]]);
 
-        Map<String, Map<Position, LogNormalDistribution>> yDirectionData = importDistributions(directions[1]);
-        //TODO:  Process this one, then unset yDirectionData. may also need to do this on a different thread + multithreads maybe
+        //Length of arrays:
+        int xLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;;
+        int yLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").yArrayLength;
 
-        Log.d("Riccardo", xDirectionData.toString());
+        Double[][] xProbabilities = new Double[yLen][xLen];
+        for (String accessPointName : xDirectionData.keySet()) {
+            RoomMatrix<LogNormalDistribution> currentAccessPointDistributions = xDirectionData.get(accessPointName);
+            for (int row = 0; row < currentAccessPointDistributions.yArrayLength; row++) {
+                for (int col = 0; col < currentAccessPointDistributions.xArrayLength; col++) {
+                    LogNormalDistribution distributionAtPoint = currentAccessPointDistributions.getValueAtIndex(row, col);
+                    double probability = distributionAtPoint.p(-1 * rssiValues.get(accessPointName));
+
+//                    if (xProbabilities[row][col] == null) {
+                        xProbabilities[row][col] = probability;
+//                    } else {
+//                        xProbabilities[row][col] += probability;
+//                    }
+                }
+            }
+
+            Log.d("Riccardo", "-------------------------");
+            for (Double[] row : xProbabilities) {
+                String string = "";
+                for (Double prob : row) {
+                    string += (prob > 0.015 ? "1" : "0") + ",";
+                }
+                Log.d("Riccardo", string);
+            }
+        }
     }
 
-    public Map<String, Map<Position, LogNormalDistribution>> importDistributions(int direction) {
+    public Map<String, RoomMatrix<LogNormalDistribution>> importDistributions(int direction) {
         try {
             //Read data from file
             String directionName = DatabaseWrapper.DIRECTION_NAMES[direction];
@@ -107,7 +147,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
 
             String distributionDataString = new String(bytes);
             JSONObject RSSIDistributionJSON = new JSONObject(distributionDataString);
-            Map<String, Map<Position, LogNormalDistribution>> RSSIDistributions = new HashMap<>();
+            Map<String, RoomMatrix<LogNormalDistribution>> RSSIDistributions = new HashMap<>();
             for (Iterator<String> it = RSSIDistributionJSON.keys(); it.hasNext(); ) {
                 String accessPointName = it.next();
                 JSONArray accessPointDataJSON = RSSIDistributionJSON.getJSONArray(accessPointName);
@@ -127,7 +167,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
 
                     accessPointData.put(position, distribution);
                 }
-                RSSIDistributions.put(accessPointName, accessPointData);
+                RSSIDistributions.put(accessPointName, new RoomMatrix<LogNormalDistribution>(accessPointData, LogNormalDistribution.class));
             }
             return RSSIDistributions;
 

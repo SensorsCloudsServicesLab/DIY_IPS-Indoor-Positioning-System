@@ -70,6 +70,15 @@ public class RoomSimulator {
         return list;
     }
 
+    public Map<String, Double> sampleRSSI(Position position) {
+        Map<String, Double> samples = new HashMap<>();
+        for (String accessPointName : accessPointPositions.keySet()) {
+            double distance = position.distanceFrom(this.accessPointPositions.get(accessPointName));
+            samples.put(accessPointName, this.distanceToRSSI(distance) + this.getDistributionNoise());
+        }
+        return samples;
+    }
+
     public double getDistributionNoise() {
         return this.noiseDistribution.rand();
     }
