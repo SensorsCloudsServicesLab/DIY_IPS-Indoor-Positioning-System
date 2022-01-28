@@ -12,7 +12,7 @@ class GPRModel:
         self.outputResolution = outputResolution
         self.trained = False
 
-        kernel = RBF([5,5], (1e-1, 1e1))
+        kernel = RBF(1.0)
         self.gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=15)
 
     def train(self, coords, values):
@@ -28,12 +28,24 @@ class GPRModel:
         x2 = np.linspace(X[:,1].min(), X[:,1].max(), self.x2_number_of_points) #q
 
         #Train the model
-        self.gp.fit(X, Z)
+        while True:
+            self.gp.fit(X, Z)
+            
+            #Predict the z values based at each xy coordinate of the prediction input space
+            self.xy = np.array(list(product(x1, x2)))
+            self.z_pred= self.gp.predict(self.xy)
+            self.trained = True
 
-        #Predict the z values based at each xy coordinate of the prediction input space
-        self.xy = np.array(list(product(x1, x2)))
-        self.z_pred, MSE = self.gp.predict(self.xy, return_std=True)
-        self.trained = True
+            #Sometimes the fitting goes wrong, and predicts all values to be approximately zero. This code detects this case and retrains the model if it happens
+            #The strategy is to get the highest observed value, then predict a value very close to it. If the percentage difference is more than 25%, then it must be wrong.
+            highest_abs_value = max(values, key=abs)
+            coord_of_highest_abs_value = coords[values.index(highest_abs_value)]
+            test_result = self.gp.predict([(coord_of_highest_abs_value[0] + 0.1, coord_of_highest_abs_value[1] + 0.1)])
+            if abs((test_result - highest_abs_value)/highest_abs_value) < 0.25:
+                self.plot3D()
+                break
+            else:
+                print("Fitted incorrectly. Recalculating...")
 
     def plot2D(self):
         if not self.trained:

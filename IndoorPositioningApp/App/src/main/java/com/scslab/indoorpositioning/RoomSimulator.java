@@ -1,12 +1,14 @@
 package com.scslab.indoorpositioning;
 
-import java.lang.reflect.Array;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
-import smile.stat.distribution.LogNormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution;
 
 public class RoomSimulator {
 
@@ -14,7 +16,7 @@ public class RoomSimulator {
     private double roomHeight;
     private double observationsAtEachPoint;
     private Map<String, Position> accessPointPositions;
-    private LogNormalDistribution noiseDistribution = new LogNormalDistribution(0, 2.5);
+    private SkewGeneralizedNormalDistribution noiseDistribution = new SkewGeneralizedNormalDistribution(5.7, 3, -0.4, new Random());
 
     public RoomSimulator(double roomWidth, double roomHeight, int observationsAtEachPoint) {
         this.roomWidth = roomWidth;
@@ -52,7 +54,7 @@ public class RoomSimulator {
                     List<Double> observations = new ArrayList<>();
                     for (int i = 0; i < this.observationsAtEachPoint; i++) {
                         double distance = position.distanceFrom(this.accessPointPositions.get(accessPointName));
-                        observations.add(this.distanceToRSSI(distance) + this.getDistributionNoise());
+                        observations.add((double) Math.round(this.distanceToRSSI(distance) + this.getDistributionNoise()));
                     }
                     accessPointData.put(position, observations);
                 }
@@ -80,7 +82,7 @@ public class RoomSimulator {
     }
 
     public double getDistributionNoise() {
-        return this.noiseDistribution.rand();
+        return this.noiseDistribution.nextRandom();
     }
 
     public double distanceToRSSI(double distance) {

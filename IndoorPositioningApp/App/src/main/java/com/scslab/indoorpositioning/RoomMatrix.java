@@ -1,7 +1,5 @@
 package com.scslab.indoorpositioning;
 
-import android.util.Log;
-
 import java.lang.reflect.Array;
 import java.util.Map;
 

@@ -2,6 +2,7 @@ package com.scslab.indoorpositioning;
 
 import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,7 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import smile.stat.distribution.LogNormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMMEstimator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 class DistributionProcessor {
 
@@ -38,15 +41,16 @@ class DistributionProcessor {
                 Map<Position, List<Double>> accessPointDistributionData = new HashMap<>();
                 Map<Position, List<Double>> accessPointData = RSSIData.get(accessPointName);
                 for (Position position : accessPointData.keySet()) {
-                    double[] positionRSSIData = prepareDataForDistribution(accessPointData.get(position));
+                    double[] positionRSSIData = accessPointData.get(position).stream().mapToDouble(i -> i).toArray();
                     if (positionRSSIData.length < 2) {
                         continue; //not enough data to fit a regression model -> throws an exception
                     }
 
-                    LogNormalDistribution distribution = LogNormalDistribution.fit(positionRSSIData);
+                    SkewGeneralizedNormalDistribution distribution = SkewGNormalLMMEstimator.STATIC.estimate(positionRSSIData, DoubleArrayAdapter.STATIC);
                     List<Double> distributionParameters = new ArrayList<>();
-                    distributionParameters.add(distribution.mu);
-                    distributionParameters.add(distribution.sigma);
+                    distributionParameters.add(distribution.getLocation());
+                    distributionParameters.add(distribution.getScale());
+                    distributionParameters.add(distribution.getSkew());
                     accessPointDistributionData.put(position, distributionParameters);
                 }
                 distributionData.put(accessPointName, accessPointDistributionData);
@@ -55,14 +59,6 @@ class DistributionProcessor {
         }
 
         return directionalDistributionData;
-    }
-
-    public static double[] prepareDataForDistribution(List<Double> list) {
-        double[] array = new double[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            array[i] = Math.abs(list.get(i));
-        }
-        return array;
     }
 
     public static void saveDataJSON(Activity activity, List<Map<String, Map<Position, List<Double>>>> RSSIDirectionalDistributions) {
@@ -77,10 +73,11 @@ class DistributionProcessor {
                     for (Position position : accessPointData.keySet()) {
                         List<Double> distributionData = accessPointData.get(position);
                         JSONObject distributionJSON = new JSONObject();
-                        distributionJSON.put("ref_x", position.x);
-                        distributionJSON.put("ref_y", position.y);
-                        distributionJSON.put("mu", distributionData.get(0));
-                        distributionJSON.put("sigma", distributionData.get(1));
+                        distributionJSON.put("x", position.x);
+                        distributionJSON.put("y", position.y);
+                        distributionJSON.put("loc", distributionData.get(0));
+                        distributionJSON.put("scale", distributionData.get(1));
+                        distributionJSON.put("skew", distributionData.get(2));
                         positionDataJSON.put(distributionJSON);
                     }
                     directionalDistributionDataJSON.put(accessPointName, positionDataJSON);
@@ -98,6 +95,8 @@ class DistributionProcessor {
             FileOutputStream stream = new FileOutputStream(distributionDataFile);
             stream.write(distributionData.getBytes());
             stream.close();
+
+            Toast.makeText(activity, "Saving Complete.", Toast.LENGTH_SHORT).show();
 
         } catch (JSONException e) {
             Log.d("Riccardo | JSONException", e.getMessage());

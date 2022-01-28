@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import smile.stat.distribution.LogNormalDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution;
 
 public class IndoorLocalisationActivity extends AppCompatActivity {
 
@@ -37,7 +37,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
     private WifiManager wifiManager;
     private List<ScanResult> wifiList;
     private DirectionManager directionManager;
-    private final Map<String, Map<String, RoomMatrix<LogNormalDistribution>>> distributions = new HashMap<>();
+    private final Map<String, Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>>> distributions = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +98,8 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
         Map<String, Double> rssiValues = sim.sampleRSSI(new Position(3, 4));
 
         //Get the associated maps
-        Map<String, RoomMatrix<LogNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
-        Map<String, RoomMatrix<LogNormalDistribution>> yDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[1]]);
+        Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
+        Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> yDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[1]]);
 
         //Length of arrays:
         int xLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;;
@@ -107,11 +107,11 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
 
         Double[][] xProbabilities = new Double[yLen][xLen];
         for (String accessPointName : xDirectionData.keySet()) {
-            RoomMatrix<LogNormalDistribution> currentAccessPointDistributions = xDirectionData.get(accessPointName);
+            RoomMatrix<SkewGeneralizedNormalDistribution> currentAccessPointDistributions = xDirectionData.get(accessPointName);
             for (int row = 0; row < currentAccessPointDistributions.yArrayLength; row++) {
                 for (int col = 0; col < currentAccessPointDistributions.xArrayLength; col++) {
-                    LogNormalDistribution distributionAtPoint = currentAccessPointDistributions.getValueAtIndex(row, col);
-                    double probability = distributionAtPoint.p(-1 * rssiValues.get(accessPointName));
+                    SkewGeneralizedNormalDistribution distributionAtPoint = currentAccessPointDistributions.getValueAtIndex(row, col);
+                    double probability = distributionAtPoint.pdf(rssiValues.get(accessPointName));
 
 //                    if (xProbabilities[row][col] == null) {
                         xProbabilities[row][col] = probability;
@@ -125,14 +125,14 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
             for (Double[] row : xProbabilities) {
                 String string = "";
                 for (Double prob : row) {
-                    string += (prob > 0.015 ? "1" : "0") + ",";
+                    string += (prob > 0.015 ? "#" : " ") + ",";
                 }
                 Log.d("Riccardo", string);
             }
         }
     }
 
-    public Map<String, RoomMatrix<LogNormalDistribution>> importDistributions(int direction) {
+    public Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> importDistributions(int direction) {
         try {
             //Read data from file
             String directionName = DatabaseWrapper.DIRECTION_NAMES[direction];
@@ -147,27 +147,28 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
 
             String distributionDataString = new String(bytes);
             JSONObject RSSIDistributionJSON = new JSONObject(distributionDataString);
-            Map<String, RoomMatrix<LogNormalDistribution>> RSSIDistributions = new HashMap<>();
+            Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> RSSIDistributions = new HashMap<>();
             for (Iterator<String> it = RSSIDistributionJSON.keys(); it.hasNext(); ) {
                 String accessPointName = it.next();
                 JSONArray accessPointDataJSON = RSSIDistributionJSON.getJSONArray(accessPointName);
-                Map<Position, LogNormalDistribution> accessPointData = new HashMap<>();
+                Map<Position, SkewGeneralizedNormalDistribution> accessPointData = new HashMap<>();
                 for (int i = 0; i < accessPointDataJSON.length(); i++) {
                     JSONObject positionDistributionJSON = accessPointDataJSON.getJSONObject(i);
 
                     Position position = new Position(
-                            positionDistributionJSON.getDouble("ref_x"),
-                            positionDistributionJSON.getDouble("ref_y")
+                        positionDistributionJSON.getDouble("x"),
+                        positionDistributionJSON.getDouble("y")
                     );
 
-                    LogNormalDistribution distribution = new LogNormalDistribution(
-                        Math.max(positionDistributionJSON.getDouble("mu"), 0),
-                        Math.max(positionDistributionJSON.getDouble("sigma"), 0.01)
+                    SkewGeneralizedNormalDistribution distribution = new SkewGeneralizedNormalDistribution(
+                        positionDistributionJSON.getDouble("loc"),
+                        positionDistributionJSON.getDouble("scale"),
+                        positionDistributionJSON.getDouble("skew")
                     );
 
                     accessPointData.put(position, distribution);
                 }
-                RSSIDistributions.put(accessPointName, new RoomMatrix<LogNormalDistribution>(accessPointData, LogNormalDistribution.class));
+                RSSIDistributions.put(accessPointName, new RoomMatrix<SkewGeneralizedNormalDistribution>(accessPointData, SkewGeneralizedNormalDistribution.class));
             }
             return RSSIDistributions;
 

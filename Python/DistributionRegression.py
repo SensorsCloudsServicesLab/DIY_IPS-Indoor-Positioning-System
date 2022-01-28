@@ -15,27 +15,34 @@ for (direction, direction_data) in data_json.items():
             print(direction + ": " + access_point_name)
 
             coords = []
-            mu_values = []
-            sigma_values = []
+            location_values_raw = []
+            scale_values_raw = []
+            skew_values_raw = []
             for distribution in access_point_data:
-                coords.append((distribution["ref_x"], distribution["ref_y"]))
-                mu_values.append(distribution["mu"])
-                sigma_values.append((distribution["sigma"]))
+                coords.append((distribution["x"], distribution["y"]))
+                location_values_raw.append(distribution["loc"])
+                scale_values_raw.append(distribution["scale"])
+                skew_values_raw.append((distribution["skew"]))
 
-            muModel = GPRModel(0.1)
-            muModel.train(coords, mu_values)
-            sigmaModel = GPRModel(0.1)
-            sigmaModel.train(coords, sigma_values)
-            muCoords, muValues = muModel.get_distribution_data()
-            sigmaCoords, sigmaValues = sigmaModel.get_distribution_data()
+            location_model = GPRModel(0.1)
+            location_model.train(coords, location_values_raw)
+            scale_model = GPRModel(0.1)
+            scale_model.train(coords, scale_values_raw)
+            skew_model = GPRModel(0.1)
+            skew_model.train(coords, skew_values_raw)
+            
+            location_coords, location_values = location_model.get_distribution_data()
+            scale_coords, scale_values = scale_model.get_distribution_data()
+            skew_coords, skew_values = skew_model.get_distribution_data()
 
             distribution_data = []
-            for i in range(0, len(muCoords)):
+            for i in range(0, len(location_coords)):
                 point_data = {
-                    'ref_x' : muCoords[i][0],
-                    'ref_y' : muCoords[i][1],
-                    'mu' : muValues[i],
-                    'sigma' : sigmaValues[i]
+                    'x' : location_coords[i][0],
+                    'y' : location_coords[i][1],
+                    'loc' : location_values[i],
+                    'scale' : scale_values[i],
+                    'skew' : skew_values[i]
                 }
                 distribution_data.append(point_data)
             directional_data_json[access_point_name] = distribution_data
