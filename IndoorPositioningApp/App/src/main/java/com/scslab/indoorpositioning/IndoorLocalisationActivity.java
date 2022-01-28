@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -102,33 +103,44 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
         Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> yDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[1]]);
 
         //Length of arrays:
-        int xLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;;
+        int xLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;
         int yLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").yArrayLength;
 
-        Double[][] xProbabilities = new Double[yLen][xLen];
+        //Get all the access point names without the GHZ part
+        List<String> accessPointNames = new ArrayList<>();
         for (String accessPointName : xDirectionData.keySet()) {
-            RoomMatrix<SkewGeneralizedNormalDistribution> currentAccessPointDistributions = xDirectionData.get(accessPointName);
-            for (int row = 0; row < currentAccessPointDistributions.yArrayLength; row++) {
-                for (int col = 0; col < currentAccessPointDistributions.xArrayLength; col++) {
-                    SkewGeneralizedNormalDistribution distributionAtPoint = currentAccessPointDistributions.getValueAtIndex(row, col);
-                    double probability = distributionAtPoint.pdf(rssiValues.get(accessPointName));
+            accessPointName = accessPointName.replace("_2GHZ", "");
+            accessPointName = accessPointName.replace("_5GHZ", "");
+            if (!accessPointNames.contains(accessPointName)) {
+                accessPointNames.add(accessPointName);
+            }
+        }
 
-//                    if (xProbabilities[row][col] == null) {
+        Double[][] xProbabilities = new Double[yLen][xLen];
+        for (String accessPointName : accessPointNames) {
+            RoomMatrix<SkewGeneralizedNormalDistribution> current2GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_2GHZ");
+            RoomMatrix<SkewGeneralizedNormalDistribution> current5GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_2GHZ");
+            for (int row = 0; row < current2GHZAccessPointDistributions.yArrayLength; row++) {
+                for (int col = 0; col < current2GHZAccessPointDistributions.xArrayLength; col++) {
+                    SkewGeneralizedNormalDistribution distribution2GHZ = current2GHZAccessPointDistributions.getValueAtIndex(row, col);
+                    SkewGeneralizedNormalDistribution distribution5GHZ = current5GHZAccessPointDistributions.getValueAtIndex(row, col);
+                    double probability = distribution2GHZ.pdf(rssiValues.get(accessPointName+"_2GHZ")) * distribution5GHZ.pdf(rssiValues.get(accessPointName+"_5GHZ"));
+
+                    if (xProbabilities[row][col] == null) {
                         xProbabilities[row][col] = probability;
-//                    } else {
-//                        xProbabilities[row][col] += probability;
-//                    }
+                    } else {
+                        xProbabilities[row][col] += probability;
+                    }
                 }
             }
+        }
 
-            Log.d("Riccardo", "-------------------------");
-            for (Double[] row : xProbabilities) {
-                String string = "";
-                for (Double prob : row) {
-                    string += (prob > 0.015 ? "#" : " ") + ",";
-                }
-                Log.d("Riccardo", string);
+        for (Double[] row : xProbabilities) {
+            StringBuilder string = new StringBuilder();
+            for (Double prob : row) {
+                string.append(prob > 0.04 ? "#" : " ").append(",");
             }
+            Log.d("Riccardo", string.toString());
         }
     }
 
