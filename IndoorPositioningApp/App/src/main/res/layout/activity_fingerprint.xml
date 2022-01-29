@@ -184,5 +184,16 @@
 
         </LinearLayout>
 
+        <ToggleButton
+            android:id="@+id/auto_refresh"
+            style="@android:style/Widget.Material.Button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:checked="false"
+            android:textOff="@string/auto_refresh_amp_submit_off"
+            android:textOn="@string/auto_refresh_amp_submit_on" />
+
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

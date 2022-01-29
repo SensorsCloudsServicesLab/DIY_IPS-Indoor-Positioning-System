@@ -5,6 +5,7 @@
     <string name="user_id_title">User ID</string>
     <string name="detected_networks">Detected Networks</string>
     <string name="refresh">Refresh</string>
+    <string name="auto_refresh">Auto Refresh &amp; Submit</string>
     <string name="collect_rssi_text">Collect RSSI Data</string>
     <string name="process_distributions_text">Process Distributions Data</string>
     <string name="process_regression_text">Process Regression Data</string>
@@ -18,4 +19,6 @@
     <string name="down_arrow">▼</string>
     <string name="zero">0</string>
     <string name="angle_label">Angle From North</string>
+    <string name="auto_refresh_amp_submit_off">Auto Refresh &amp; Submit: Off</string>
+    <string name="auto_refresh_amp_submit_on">Auto Refresh &amp; Submit: On</string>
 </resources>

@@ -7,10 +7,14 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class CollectRSSIDataActivity extends AppCompatActivity {
 
@@ -19,6 +23,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     private EditText angle_edit_text;
     private Button checkLocationButton;
     private Button submitButton;
+    private ToggleButton autoRefreshButton;
     private Button upArrowButton;
     private Button downArrowButton;
     private Button leftArrowButton;
@@ -32,6 +37,10 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     private final float x_increment = 0.5f;
     private final float y_increment = 0.5f;
 
+    private Timer autoRefreshTimer = new Timer();
+    private int currentAutoRefreshIndex = 0;
+    private final int numAutoRefreshes = 100;
+
     private DatabaseWrapper database = new DatabaseWrapper(this);
 
     @Override
@@ -43,6 +52,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         this.networkListView = findViewById(R.id.networkListView);
         this.checkLocationButton = findViewById(R.id.check_location_button);
         this.submitButton = findViewById(R.id.submit_button);
+        this.autoRefreshButton = findViewById(R.id.auto_refresh);
         this.reference_x_edit_text = findViewById(R.id.reference_x);
         this.reference_y_edit_text = findViewById(R.id.reference_y);
         this.angle_edit_text = findViewById(R.id.angle);
@@ -63,6 +73,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     private void initUI() {
         checkLocationButton.setOnClickListener(v -> this.getLocationData());
         submitButton.setOnClickListener(v -> this.uploadFingerprintData());
+        autoRefreshButton.setOnCheckedChangeListener((v, isChecked) -> this.autoRefreshAndUpload(isChecked));
         upArrowButton.setOnClickListener(v -> addFloatToEditText(reference_y_edit_text, y_increment));
         downArrowButton.setOnClickListener(v -> addFloatToEditText(reference_y_edit_text, -y_increment));
         leftArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, -x_increment));
@@ -98,6 +109,33 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         float ref_y = Float.parseFloat(reference_y_edit_text.getText().toString());
         float angle = Float.parseFloat(angle_edit_text.getText().toString());
         database.addFingerprintRecord(ref_x, ref_y, angle, wifiList);
+    }
+
+    private void autoRefreshAndUpload(boolean isOn) {
+        if (isOn) {
+            autoRefreshTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (currentAutoRefreshIndex >= numAutoRefreshes) {
+                        autoRefreshTimer.cancel();
+                        currentAutoRefreshIndex = 0;
+                        runOnUiThread(() -> {
+                            Toast.makeText(CollectRSSIDataActivity.this, "Auto Refresh Complete", Toast.LENGTH_SHORT).show();
+                        });
+                        return;
+                    }
+
+                    runOnUiThread(() -> {
+                        getLocationData();
+                        uploadFingerprintData();
+                        currentAutoRefreshIndex++;
+                    });
+                }
+            }, 0, 4000);
+        } else {
+            autoRefreshTimer.cancel();
+            currentAutoRefreshIndex = 0;
+        }
     }
 
     protected void onResume() {
