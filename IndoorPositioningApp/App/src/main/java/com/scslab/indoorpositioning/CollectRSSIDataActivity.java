@@ -118,6 +118,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
                 public void run() {
                     if (currentAutoRefreshIndex >= numAutoRefreshes) {
                         autoRefreshTimer.cancel();
+                        autoRefreshTimer = new Timer();
                         currentAutoRefreshIndex = 0;
                         runOnUiThread(() -> {
                             Toast.makeText(CollectRSSIDataActivity.this, "Auto Refresh Complete", Toast.LENGTH_SHORT).show();
@@ -134,6 +135,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
             }, 0, 4000);
         } else {
             autoRefreshTimer.cancel();
+            autoRefreshTimer = new Timer();
             currentAutoRefreshIndex = 0;
         }
     }
