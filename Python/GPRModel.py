@@ -1,7 +1,6 @@
 from itertools import product
 import numpy as np
 from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
@@ -42,7 +41,7 @@ class GPRModel:
             coord_of_highest_abs_value = coords[values.index(highest_abs_value)]
             test_result = self.gp.predict([(coord_of_highest_abs_value[0] + 0.1, coord_of_highest_abs_value[1] + 0.1)])
             if abs((test_result - highest_abs_value)/highest_abs_value) < 0.25:
-                self.plot3D()
+                self.plot2D()
                 break
             else:
                 print("Fitted incorrectly. Recalculating...")
@@ -57,7 +56,7 @@ class GPRModel:
 
         fig = plt.figure(figsize=(10,8))
         ax = fig.add_subplot(111)
-        ax.pcolormesh(x_prediction, y_prediction, z_prediction)
+        ax.pcolormesh(x_prediction, y_prediction, z_prediction, cmap='jet')
         plt.show()
 
     def plot3D(self):
