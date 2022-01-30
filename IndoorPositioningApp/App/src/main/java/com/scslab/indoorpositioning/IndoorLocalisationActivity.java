@@ -95,7 +95,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
         int[] directions = Helpers.getClosestDirections(degreesFromNorth);
 
         //Read RSSI values
-        RoomSimulator sim = new RoomSimulator(8, 8, 100);
+        RoomSimulator sim = new RoomSimulator(8, 8, 50);
         Map<String, Double> rssiValues = sim.sampleRSSI(new Position(3, 4));
 
         //Get the associated maps

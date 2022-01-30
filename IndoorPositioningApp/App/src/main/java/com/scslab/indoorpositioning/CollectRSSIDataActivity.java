@@ -39,7 +39,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
 
     private Timer autoRefreshTimer = new Timer();
     private int currentAutoRefreshIndex = 0;
-    private final int numAutoRefreshes = 100;
+    private final int numAutoRefreshes = 50;
 
     private DatabaseWrapper database = new DatabaseWrapper(this);
 
@@ -132,7 +132,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
                         currentAutoRefreshIndex++;
                     });
                 }
-            }, 0, 4000);
+            }, 0, 2500);
         } else {
             autoRefreshTimer.cancel();
             autoRefreshTimer = new Timer();

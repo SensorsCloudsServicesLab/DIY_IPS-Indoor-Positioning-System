@@ -24,7 +24,7 @@ class DistributionProcessor {
 
     public static void getDataFromDatabase(Activity activity, boolean should_simulate_data, DatabaseWrapper.OnCompleteListener onCompleteListener) {
         if (should_simulate_data) {
-            RoomSimulator simulator = new RoomSimulator(8, 8, 100);
+            RoomSimulator simulator = new RoomSimulator(8, 8, 50);
             onCompleteListener.onComplete(simulator.simulateForAllDirections());
             return;
         }
