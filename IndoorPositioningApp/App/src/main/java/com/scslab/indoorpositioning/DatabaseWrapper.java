@@ -106,14 +106,14 @@ public class DatabaseWrapper {
                 .addOnSuccessListener((DocumentReference documentReference) -> {
                     Activity activity = activityWeakReference.get();
                     if (activity != null && !activity.isFinishing()) {
-                        Toast.makeText(activity, "Recorded with ID: " + documentReference.getId(), Toast.LENGTH_SHORT).show();
+                        ToastManager.showToast(activity, "Recorded with ID: " + documentReference.getId());
                     }
                     Log.d(TAG, "Recorded with ID: " + documentReference.getId());
                 })
                 .addOnFailureListener((@NonNull Exception e) -> {
                     Activity activity = activityWeakReference.get();
                     if (activity != null && !activity.isFinishing()) {
-                        Toast.makeText(activity, "Error adding record", Toast.LENGTH_SHORT).show();
+                        ToastManager.showToast(activity, "Error adding record");
                     }
                     Log.d(TAG, e.getMessage());
                     e.printStackTrace();

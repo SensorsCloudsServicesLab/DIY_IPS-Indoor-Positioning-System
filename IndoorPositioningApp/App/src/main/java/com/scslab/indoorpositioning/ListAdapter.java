@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class ListAdapter extends BaseAdapter {
@@ -27,6 +28,8 @@ public class ListAdapter extends BaseAdapter {
                 this.wifiList.add(scanResult);
             }
         }
+
+        this.wifiList.sort(Comparator.comparing(a -> a.SSID));
 
         for (ScanResult scanResult : wifiList) {
             if (!scanResult.SSID.contains("SCSLAB_AP")) {

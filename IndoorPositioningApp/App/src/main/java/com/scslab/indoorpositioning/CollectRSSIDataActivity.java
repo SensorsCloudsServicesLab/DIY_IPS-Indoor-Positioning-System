@@ -1,20 +1,21 @@
 package com.scslab.indoorpositioning;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class CollectRSSIDataActivity extends AppCompatActivity {
 
@@ -37,9 +38,8 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     private final float x_increment = 0.5f;
     private final float y_increment = 0.5f;
 
-    private Timer autoRefreshTimer = new Timer();
     private int currentAutoRefreshIndex = 0;
-    private final int numAutoRefreshes = 50;
+    private final int numAutoRefreshes = 25;
 
     private DatabaseWrapper database = new DatabaseWrapper(this);
 
@@ -111,32 +111,50 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         database.addFingerprintRecord(ref_x, ref_y, angle, wifiList);
     }
 
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent intent) {
+            // This condition is not necessary if you listen to only one action
+            if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+                if (currentAutoRefreshIndex >= numAutoRefreshes) {
+                    autoRefreshButton.setChecked(false);
+                    return;
+                }
+
+                //Wifi Data
+                wifiList = wifiManager.getScanResults();
+                ListAdapter listAdapter = new ListAdapter(getApplicationContext(), wifiList);
+                networkListView.setAdapter(listAdapter);
+
+                //Direction Data
+                angle_edit_text.setText(String.valueOf(directionManager.getCurrentDegreesFromNorth()));
+
+                //Upload Data
+                uploadFingerprintData();
+
+                //State
+                currentAutoRefreshIndex++;
+
+                wifiManager.startScan();
+            }
+        }
+    };
+
     private void autoRefreshAndUpload(boolean isOn) {
         if (isOn) {
-            autoRefreshTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (currentAutoRefreshIndex >= numAutoRefreshes) {
-                        autoRefreshTimer.cancel();
-                        autoRefreshTimer = new Timer();
-                        currentAutoRefreshIndex = 0;
-                        runOnUiThread(() -> {
-                            Toast.makeText(CollectRSSIDataActivity.this, "Auto Refresh Complete", Toast.LENGTH_SHORT).show();
-                        });
-                        return;
-                    }
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 
-                    runOnUiThread(() -> {
-                        getLocationData();
-                        uploadFingerprintData();
-                        currentAutoRefreshIndex++;
-                    });
-                }
-            }, 0, 2500);
+            registerReceiver(broadcastReceiver, intentFilter);
+
+            wifiManager.startScan();
         } else {
-            autoRefreshTimer.cancel();
-            autoRefreshTimer = new Timer();
-            currentAutoRefreshIndex = 0;
+            try {
+                unregisterReceiver(broadcastReceiver);
+                currentAutoRefreshIndex = 0;
+            } catch(IllegalArgumentException e) {
+                Log.d("Riccardo", "receiver already unregistered");
+            }
         }
     }
 
