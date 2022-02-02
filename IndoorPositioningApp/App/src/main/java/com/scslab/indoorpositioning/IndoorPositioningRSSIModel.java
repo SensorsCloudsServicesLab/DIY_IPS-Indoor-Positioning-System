@@ -135,8 +135,10 @@ public class IndoorPositioningRSSIModel {
         Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> yDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[1]]);
 
         //Length of arrays:
-        int xLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;
-        int yLen = xDirectionData.get("SCSLAB_AP_1_2GHZ").yArrayLength;
+        int xDirectionCols = xDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;
+        int xDirectionRows = xDirectionData.get("SCSLAB_AP_1_2GHZ").yArrayLength;
+        int yDirectionCols = yDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;
+        int yDirectionRows = yDirectionData.get("SCSLAB_AP_1_2GHZ").yArrayLength;
 
         //Get all the access point names without the GHZ part
         List<String> accessPointNames = new ArrayList<>();
@@ -149,10 +151,10 @@ public class IndoorPositioningRSSIModel {
         }
 
         Double maxProbability = 0.0;
-        Double[][] xProbabilities = new Double[yLen][xLen];
+        Double[][] xProbabilities = new Double[xDirectionRows][xDirectionCols];
         for (String accessPointName : accessPointNames) {
             RoomMatrix<SkewGeneralizedNormalDistribution> current2GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_2GHZ");
-            RoomMatrix<SkewGeneralizedNormalDistribution> current5GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_2GHZ");
+            RoomMatrix<SkewGeneralizedNormalDistribution> current5GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_5GHZ");
             for (int row = 0; row < current2GHZAccessPointDistributions.yArrayLength; row++) {
                 for (int col = 0; col < current2GHZAccessPointDistributions.xArrayLength; col++) {
                     SkewGeneralizedNormalDistribution distribution2GHZ = current2GHZAccessPointDistributions.getValueAtIndex(row, col);
