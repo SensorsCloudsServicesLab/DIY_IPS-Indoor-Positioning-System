@@ -1,9 +1,11 @@
 package com.scslab.indoorpositioning;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -14,6 +16,8 @@ import android.widget.ListView;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
@@ -68,6 +72,11 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
 
         //Update the network info
         getLocationData();
+
+        //Check Permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+        }
     }
 
     private void initUI() {
@@ -94,6 +103,12 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     }
 
     private void getLocationData() {
+        //Check Permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            return;
+        }
+
         //WIFI Data
         wifiManager.startScan();
         wifiList = wifiManager.getScanResults();
