@@ -148,6 +148,7 @@ public class IndoorPositioningRSSIModel {
             }
         }
 
+        Double maxProbability = 0.0;
         Double[][] xProbabilities = new Double[yLen][xLen];
         for (String accessPointName : accessPointNames) {
             RoomMatrix<SkewGeneralizedNormalDistribution> current2GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_2GHZ");
@@ -163,15 +164,10 @@ public class IndoorPositioningRSSIModel {
                     } else {
                         xProbabilities[row][col] += probability;
                     }
-                }
-            }
-        }
 
-        Double maxProbability = 0.0;
-        for (Double[] row : xProbabilities) {
-            for (Double prob : row) {
-                if (prob > maxProbability) {
-                    maxProbability = prob;
+                    if (xProbabilities[row][col] > maxProbability) {
+                        maxProbability = xProbabilities[row][col];
+                    }
                 }
             }
         }
@@ -185,7 +181,7 @@ public class IndoorPositioningRSSIModel {
             Log.d("Riccardo", string.toString());
         }
 
-        return new Position(0, 0);
+        return calcCentroid(xProbabilities, thresholdProbability);
     }
 
     public Map<String, Double> getRssiValues(boolean shouldSimulateData) {
@@ -203,6 +199,24 @@ public class IndoorPositioningRSSIModel {
             }
         }
         return rssiValues;
+    }
+
+    public Position calcCentroid(Double[][] map, Double threshold) {
+        double x = 0;
+        double y = 0;
+        int rows = map.length;
+        int cols = map[0].length;
+        int numAboveThreshold = 0;
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (map[row][col] > threshold) {
+                    x += col*0.1;
+                    y += row*0.1;
+                    numAboveThreshold++;
+                }
+            }
+        }
+        return new Position(x/numAboveThreshold, y/numAboveThreshold);
     }
 
     public void onResume() {
