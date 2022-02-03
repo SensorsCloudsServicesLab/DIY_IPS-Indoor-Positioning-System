@@ -1,6 +1,9 @@
 package com.scslab.indoorpositioning;
 
+import androidx.annotation.NonNull;
+
 import java.lang.reflect.Array;
+import java.util.Comparator;
 import java.util.Map;
 
 public class RoomMatrix<T> {
@@ -51,6 +54,47 @@ public class RoomMatrix<T> {
 
     public T getValueAtIndex(int row, int col) {
         return this.data[row][col];
+    }
+
+    public T getMaxValue(Comparator<T> comparator) {
+        T maxValue = data[0][0];
+
+        for (int row = 0; row < yArrayLength; row++) {
+            for (int col = 0; col < xArrayLength; col++) {
+                if (comparator.compare(data[row][col], maxValue) > 0) {
+                    maxValue = data[row][col];
+                }
+            }
+        }
+
+        return maxValue;
+    }
+
+    public RoomMatrix<T> operate(RoomMatrixUnitOperator<T> operator) {
+        for (int row = 0; row < yArrayLength; row++) {
+            for (int col = 0; col < xArrayLength; col++) {
+                data[row][col] = operator.operate(row, col);
+            }
+        }
+        return this;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder string = new StringBuilder();
+        for (int row = 0; row < yArrayLength; row++) {
+            for (int col = 0; col < xArrayLength; col++) {
+                string.append(getValueAtIndex(row, col));
+            }
+            string.append("\n");
+        }
+        return string.toString();
+    }
+
+    @FunctionalInterface
+    public interface RoomMatrixUnitOperator<T> {
+        T operate(int row, int col);
     }
 
 }

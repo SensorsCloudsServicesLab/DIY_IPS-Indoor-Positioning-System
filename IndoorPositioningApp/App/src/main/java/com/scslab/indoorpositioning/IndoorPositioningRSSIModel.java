@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -134,15 +135,32 @@ public class IndoorPositioningRSSIModel {
         Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
         Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> yDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[1]]);
 
-        //Length of arrays:
-        int xDirectionCols = xDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;
-        int xDirectionRows = xDirectionData.get("SCSLAB_AP_1_2GHZ").yArrayLength;
-        int yDirectionCols = yDirectionData.get("SCSLAB_AP_1_2GHZ").xArrayLength;
-        int yDirectionRows = yDirectionData.get("SCSLAB_AP_1_2GHZ").yArrayLength;
+        RoomMatrix<Double> xProbabilities = calculateProbabilityMap(rssiValues, xDirectionData);
+        RoomMatrix<Double> yProbabilities = calculateProbabilityMap(rssiValues, yDirectionData);
 
+        double xScale = Math.pow(Math.cos(degreesFromNorth + 90), 2);
+        double yScale = Math.pow(Math.sin(degreesFromNorth + 90), 2);
+        RoomMatrix<Double> probabilities = xProbabilities.operate((int row, int col) -> {
+            return (xScale * xProbabilities.getValueAtIndex(row, col)) + (yScale * yProbabilities.getValueAtIndex(row, col));
+        });
+
+        Double maxProbability = probabilities.getMaxValue(Comparator.comparingDouble(a -> a));
+        Double thresholdProbability = maxProbability*(1-thresholdProbabilityPercentage);
+        for (int row = 0; row < probabilities.yArrayLength; row++) {
+            StringBuilder string = new StringBuilder();
+            for (int col = 0; col < probabilities.xArrayLength; col++) {
+                string.append(probabilities.getValueAtIndex(row, col) > thresholdProbability ? "#," : " ,");
+            }
+            Log.d("Riccardo", string.toString());
+        }
+
+        return calcCentroid(probabilities, thresholdProbability);
+    }
+
+    public RoomMatrix<Double> calculateProbabilityMap(Map<String, Double> rssiValues, Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> accessPointData) {
         //Get all the access point names without the GHZ part
         List<String> accessPointNames = new ArrayList<>();
-        for (String accessPointName : xDirectionData.keySet()) {
+        for (String accessPointName : accessPointData.keySet()) {
             accessPointName = accessPointName.replace("_2GHZ", "");
             accessPointName = accessPointName.replace("_5GHZ", "");
             if (!accessPointNames.contains(accessPointName)) {
@@ -150,40 +168,31 @@ public class IndoorPositioningRSSIModel {
             }
         }
 
-        Double maxProbability = 0.0;
-        Double[][] xProbabilities = new Double[xDirectionRows][xDirectionCols];
+        int cols = accessPointData.get(accessPointData.keySet().iterator().next()).xArrayLength;
+        int rows = accessPointData.get(accessPointData.keySet().iterator().next()).yArrayLength;
+
+        //Calculate
+        Double[][] probabilities = new Double[rows][cols];
         for (String accessPointName : accessPointNames) {
-            RoomMatrix<SkewGeneralizedNormalDistribution> current2GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_2GHZ");
-            RoomMatrix<SkewGeneralizedNormalDistribution> current5GHZAccessPointDistributions = xDirectionData.get(accessPointName+"_5GHZ");
+            RoomMatrix<SkewGeneralizedNormalDistribution> current2GHZAccessPointDistributions = accessPointData.get(accessPointName+"_2GHZ");
+            RoomMatrix<SkewGeneralizedNormalDistribution> current5GHZAccessPointDistributions = accessPointData.get(accessPointName+"_5GHZ");
             for (int row = 0; row < current2GHZAccessPointDistributions.yArrayLength; row++) {
                 for (int col = 0; col < current2GHZAccessPointDistributions.xArrayLength; col++) {
                     SkewGeneralizedNormalDistribution distribution2GHZ = current2GHZAccessPointDistributions.getValueAtIndex(row, col);
                     SkewGeneralizedNormalDistribution distribution5GHZ = current5GHZAccessPointDistributions.getValueAtIndex(row, col);
                     double probability = distribution2GHZ.pdf(rssiValues.get(accessPointName+"_2GHZ")) * distribution5GHZ.pdf(rssiValues.get(accessPointName+"_5GHZ"));
 
-                    if (xProbabilities[row][col] == null) {
-                        xProbabilities[row][col] = probability;
+                    if (probabilities[row][col] == null) {
+                        probabilities[row][col] = probability;
                     } else {
-                        xProbabilities[row][col] += probability;
-                    }
-
-                    if (xProbabilities[row][col] > maxProbability) {
-                        maxProbability = xProbabilities[row][col];
+                        probabilities[row][col] += probability;
                     }
                 }
             }
         }
 
-        Double thresholdProbability = maxProbability*(1-thresholdProbabilityPercentage);
-        for (Double[] row : xProbabilities) {
-            StringBuilder string = new StringBuilder();
-            for (Double prob : row) {
-                string.append(prob > thresholdProbability ? "#" : " ").append(",");
-            }
-            Log.d("Riccardo", string.toString());
-        }
-
-        return calcCentroid(xProbabilities, thresholdProbability);
+        RoomMatrix<Double> test = new RoomMatrix<>(probabilities);
+        return test;
     }
 
     public Map<String, Double> getRssiValues(boolean shouldSimulateData) {
@@ -203,15 +212,13 @@ public class IndoorPositioningRSSIModel {
         return rssiValues;
     }
 
-    public Position calcCentroid(Double[][] map, Double threshold) {
+    public Position calcCentroid(RoomMatrix<Double> map, Double threshold) {
         double x = 0;
         double y = 0;
-        int rows = map.length;
-        int cols = map[0].length;
         int numAboveThreshold = 0;
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                if (map[row][col] > threshold) {
+        for (int row = 0; row < map.yArrayLength; row++) {
+            for (int col = 0; col < map.xArrayLength; col++) {
+                if (map.getValueAtIndex(row, col) > threshold) {
                     x += col*0.1;
                     y += row*0.1;
                     numAboveThreshold++;
