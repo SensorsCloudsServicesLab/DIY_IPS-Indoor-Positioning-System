@@ -228,11 +228,11 @@ public class IndoorPositioningRSSIModel {
         return new Position(x/numAboveThreshold, y/numAboveThreshold);
     }
 
-    public void onResume() {
-        directionManager.onResume();
-    }
-
     public void onPause() {
         directionManager.onPause();
+    }
+
+    public void onResume() {
+        directionManager.onResume();
     }
 }
