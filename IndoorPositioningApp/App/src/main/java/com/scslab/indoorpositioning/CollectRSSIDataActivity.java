@@ -39,8 +39,8 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     private List<ScanResult> wifiList;
     private DirectionManager directionManager;
 
-    private final float x_increment = 0.5f;
-    private final float y_increment = 0.5f;
+    private final float x_increment = 1f;
+    private final float y_increment = 1f;
 
     private int currentAutoRefreshIndex = 0;
     private final int numAutoRefreshes = 25;

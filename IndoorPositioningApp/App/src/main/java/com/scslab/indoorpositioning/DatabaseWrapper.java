@@ -101,7 +101,7 @@ public class DatabaseWrapper {
 
         record.put("rssi_observations", rssi_observation_list);
 
-        db.collection("rssi_records")
+        db.collection("rssi_records").document("("+ref_x+","+ref_y+")").collection("records")
                 .add(record)
                 .addOnSuccessListener((DocumentReference documentReference) -> {
                     Activity activity = activityWeakReference.get();
