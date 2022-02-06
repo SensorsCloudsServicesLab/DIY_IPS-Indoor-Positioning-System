@@ -12,6 +12,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
     private Button checkLocationButton;
 
     private IndoorPositioningModel indoorPositioningModel;
+    private IndoorVisualiser indoorVisualiser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,9 +21,10 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
 
         //Init UI
         this.checkLocationButton = findViewById(R.id.check_location_button);
+        this.indoorVisualiser = new IndoorVisualiser(this);
         checkLocationButton.setOnClickListener(v -> {
             Position position = indoorPositioningModel.getCurrentPosition();
-            Log.d("Riccardo", position.toString());
+            indoorVisualiser.setMarkerPosition(position.x,position.y);
         });
 
         //Initialisations

@@ -21,4 +21,5 @@
     <string name="angle_label">Angle From North</string>
     <string name="auto_refresh_amp_submit_off">Auto Refresh &amp; Submit: Off</string>
     <string name="auto_refresh_amp_submit_on">Auto Refresh &amp; Submit: On</string>
+    <string name="floor_plan">Floor Plan</string>
 </resources>
