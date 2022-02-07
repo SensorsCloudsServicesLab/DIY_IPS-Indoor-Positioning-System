@@ -22,8 +22,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 
 class DistributionProcessor {
 
-    public static void getDataFromDatabase(Activity activity, boolean should_simulate_data, DatabaseWrapper.OnCompleteListener onCompleteListener) {
-        if (should_simulate_data) {
+    public static void getDataFromDatabase(Activity activity, boolean shouldSimulateData, DatabaseWrapper.OnCompleteListener onCompleteListener) {
+        if (shouldSimulateData) {
             RoomSimulator simulator = new RoomSimulator(8, 8, 50);
             onCompleteListener.onComplete(simulator.simulateForAllDirections());
             return;

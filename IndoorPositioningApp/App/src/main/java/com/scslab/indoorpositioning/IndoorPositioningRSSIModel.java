@@ -129,7 +129,7 @@ public class IndoorPositioningRSSIModel {
         int[] directions = Helpers.getClosestDirections(degreesFromNorth);
 
         //Read RSSI values
-        Map<String, Double> rssiValues = getRssiValues(true);
+        Map<String, Double> rssiValues = getRssiValues(false);
 
         //Get the associated maps
         Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
@@ -180,7 +180,13 @@ public class IndoorPositioningRSSIModel {
                 for (int col = 0; col < current2GHZAccessPointDistributions.xArrayLength; col++) {
                     SkewGeneralizedNormalDistribution distribution2GHZ = current2GHZAccessPointDistributions.getValueAtIndex(row, col);
                     SkewGeneralizedNormalDistribution distribution5GHZ = current5GHZAccessPointDistributions.getValueAtIndex(row, col);
-                    double probability = distribution2GHZ.pdf(rssiValues.get(accessPointName+"_2GHZ")) * distribution5GHZ.pdf(rssiValues.get(accessPointName+"_5GHZ"));
+
+                    double probability;
+                    if (distribution2GHZ == null || distribution5GHZ == null) {
+                        probability = 0;
+                    } else {
+                        probability = distribution2GHZ.pdf(rssiValues.get(accessPointName+"_2GHZ")) * distribution5GHZ.pdf(rssiValues.get(accessPointName+"_5GHZ"));
+                    }
 
                     if (probabilities[row][col] == null) {
                         probabilities[row][col] = probability;

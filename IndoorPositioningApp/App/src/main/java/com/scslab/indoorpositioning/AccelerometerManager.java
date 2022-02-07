@@ -37,6 +37,6 @@ public class AccelerometerManager implements SensorEventListener {
         double y = event.values[0];
         double z = event.values[0];
 
-        Log.d("Riccardo", "x: " + x + ", y: " + y + ", z: " + z);
+        Log.d("Accelerometer", "x: " + x + ", y: " + y + ", z: " + z);
     }
 }

@@ -3,7 +3,6 @@ package com.scslab.indoorpositioning;
 import android.app.Activity;
 import android.net.wifi.ScanResult;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -120,6 +119,8 @@ public class DatabaseWrapper {
                 });
     }
 
+    static int num = 0;
+
     public void getRSSIDataFromDatabase(OnCompleteListener onCompleteListener) {
 
         //Prepare data structure
@@ -138,11 +139,12 @@ public class DatabaseWrapper {
         }
 
         //Read from database
-        db.collection("rssi_records")
+        db.collectionGroup("records")
             .get()
-            .addOnCompleteListener((task) -> {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+            .addOnCompleteListener((task1) -> {
+                if (task1.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task1.getResult()) {
+
                         Map<String, Object> data = document.getData();
                         Double angle = (Double) data.get("angle");
 
@@ -182,7 +184,7 @@ public class DatabaseWrapper {
 
                     onCompleteListener.onComplete(parsedDirectionalRSSIData);
                 } else {
-                    Log.d(TAG, "Error getting documents: ", task.getException());
+                    Log.d("Riccardo", "Error getting documents: ", task1.getException());
                 }
             });
     }

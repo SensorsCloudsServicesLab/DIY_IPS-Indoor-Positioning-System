@@ -24,11 +24,11 @@ for (direction, direction_data) in data_json.items():
                 scale_values_raw.append(distribution["scale"])
                 skew_values_raw.append((distribution["skew"]))
 
-            location_model = GPRModel(0.1)
+            location_model = GPRModel(0.2)
             location_model.train(coords, location_values_raw)
-            scale_model = GPRModel(0.1)
+            scale_model = GPRModel(0.2)
             scale_model.train(coords, scale_values_raw)
-            skew_model = GPRModel(0.1)
+            skew_model = GPRModel(0.2)
             skew_model.train(coords, skew_values_raw)
             
             location_coords, location_values = location_model.get_distribution_data()
