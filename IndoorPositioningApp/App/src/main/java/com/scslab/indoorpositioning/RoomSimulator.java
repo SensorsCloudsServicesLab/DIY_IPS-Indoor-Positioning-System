@@ -14,7 +14,7 @@ public class RoomSimulator {
     private double roomHeight;
     private double observationsAtEachPoint;
     private Map<String, Position> accessPointPositions;
-    private SkewGeneralizedNormalDistribution noiseDistribution = new SkewGeneralizedNormalDistribution(5.7, 3, -0.4, new Random());
+    private SkewGeneralizedNormalDistribution noiseDistribution = new SkewGeneralizedNormalDistribution(5.7, 4, -0.4, new Random());
 
     public RoomSimulator(double roomWidth, double roomHeight, int observationsAtEachPoint) {
         this.roomWidth = roomWidth;
@@ -84,6 +84,6 @@ public class RoomSimulator {
     }
 
     public double distanceToRSSI(double distance) {
-        return Math.round(-6 * distance - 20);
+        return Math.round(-2 * distance - 40);
     }
 }
