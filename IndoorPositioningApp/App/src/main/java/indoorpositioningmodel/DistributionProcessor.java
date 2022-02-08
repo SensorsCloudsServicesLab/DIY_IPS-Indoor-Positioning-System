@@ -1,4 +1,4 @@
-package com.scslab.indoorpositioning;
+package indoorpositioningmodel;
 
 import android.app.Activity;
 import android.util.Log;
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDis
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMMEstimator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
-class DistributionProcessor {
+public class DistributionProcessor {
 
     public static void getDataFromDatabase(Activity activity, boolean shouldSimulateData, DatabaseWrapper.OnCompleteListener onCompleteListener) {
         if (shouldSimulateData) {

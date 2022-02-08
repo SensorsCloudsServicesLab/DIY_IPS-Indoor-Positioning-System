@@ -12,6 +12,9 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.Map;
 
+import indoorpositioningmodel.DistributionProcessor;
+import indoorpositioningmodel.Position;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button collectRSSIDataButton;

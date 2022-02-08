@@ -1,13 +1,14 @@
-package com.scslab.indoorpositioning;
+package indoorpositioningmodel;
 
 import android.app.Activity;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-public class IndoorVisualiser {
+import com.scslab.indoorpositioning.R;
+
+public class IndoorPositioningVisualiser {
 
     private TextView positionTextView;
     private ImageView floorPlanImageView;
@@ -18,7 +19,7 @@ public class IndoorVisualiser {
     private final Position roomTopLeft = new Position(0.009, 0.009);  //in percentage
     private final Position roomBottomRight = new Position(0.964, 0.977); //in percentage
 
-    public IndoorVisualiser(Activity activity) {
+    public IndoorPositioningVisualiser(Activity activity) {
         this.positionTextView = activity.findViewById(R.id.position);
         this.floorPlanImageView = activity.findViewById(R.id.floor_plan);
         this.positionMarkerImageView = activity.findViewById(R.id.position_marker);

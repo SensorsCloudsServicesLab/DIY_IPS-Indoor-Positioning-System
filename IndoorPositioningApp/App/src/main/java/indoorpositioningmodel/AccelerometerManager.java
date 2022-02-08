@@ -1,4 +1,4 @@
-package com.scslab.indoorpositioning;
+package indoorpositioningmodel;
 
 import android.app.Activity;
 import android.content.Context;

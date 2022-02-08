@@ -1,18 +1,20 @@
 package com.scslab.indoorpositioning;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
-import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import indoorpositioningmodel.IndoorPositioningModel;
+import indoorpositioningmodel.IndoorPositioningVisualiser;
+import indoorpositioningmodel.Position;
 
 public class IndoorLocalisationActivity extends AppCompatActivity {
 
     private Button checkLocationButton;
 
     private IndoorPositioningModel indoorPositioningModel;
-    private IndoorVisualiser indoorVisualiser;
+    private IndoorPositioningVisualiser indoorVisualiser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +23,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
 
         //Init UI
         this.checkLocationButton = findViewById(R.id.check_location_button);
-        this.indoorVisualiser = new IndoorVisualiser(this);
+        this.indoorVisualiser = new IndoorPositioningVisualiser(this);
         checkLocationButton.setOnClickListener(v -> {
             Position position = indoorPositioningModel.getCurrentPosition();
             indoorVisualiser.setMarkerPosition(position.x,position.y);

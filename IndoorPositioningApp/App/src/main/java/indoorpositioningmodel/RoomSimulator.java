@@ -1,4 +1,4 @@
-package com.scslab.indoorpositioning;
+package indoorpositioningmodel;
 
 import java.util.ArrayList;
 import java.util.HashMap;

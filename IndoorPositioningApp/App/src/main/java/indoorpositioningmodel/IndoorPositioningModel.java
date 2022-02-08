@@ -1,6 +1,7 @@
-package com.scslab.indoorpositioning;
+package indoorpositioningmodel;
 
 import android.app.Activity;
+
 import java.lang.ref.WeakReference;
 
 public class IndoorPositioningModel {

@@ -1,7 +1,9 @@
-package com.scslab.indoorpositioning;
+package indoorpositioningmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import indoorpositioningmodel.DatabaseWrapper;
 
 public class Helpers {
     public static List<Double> linearArray(double start, double end, double gap) {

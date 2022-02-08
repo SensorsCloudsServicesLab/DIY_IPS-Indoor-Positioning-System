@@ -21,6 +21,9 @@ import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
+import indoorpositioningmodel.DatabaseWrapper;
+import indoorpositioningmodel.DirectionManager;
+
 public class CollectRSSIDataActivity extends AppCompatActivity {
 
     private EditText reference_x_edit_text;
