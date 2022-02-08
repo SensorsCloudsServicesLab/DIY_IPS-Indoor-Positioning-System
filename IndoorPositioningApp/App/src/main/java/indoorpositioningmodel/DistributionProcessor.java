@@ -22,9 +22,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter
 
 public class DistributionProcessor {
 
-    public static void getDataFromDatabase(Activity activity, boolean shouldSimulateData, DatabaseWrapper.OnCompleteListener onCompleteListener) {
-        if (shouldSimulateData) {
-            RoomSimulator simulator = new RoomSimulator(11, 11, 50);
+    public static void getDataFromDatabase(Activity activity, DatabaseWrapper.OnCompleteListener onCompleteListener) {
+        if (IndoorPositioningSettings.shouldSimulate) {
+            RoomSimulator simulator = new RoomSimulator(IndoorPositioningSettings.roomWidth, IndoorPositioningSettings.roomHeight, IndoorPositioningSettings.numObservations);
             onCompleteListener.onComplete(simulator.simulateForAllDirections());
             return;
         }

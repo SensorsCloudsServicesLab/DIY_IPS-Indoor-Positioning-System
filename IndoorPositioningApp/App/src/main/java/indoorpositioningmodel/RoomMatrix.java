@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class RoomMatrix<T> {
 
-    private final double positionDifference = 0.2;
     private final T[][] data;
     public int xArrayLength;
     public int yArrayLength;
@@ -25,8 +24,8 @@ public class RoomMatrix<T> {
             }
         }
 
-        xArrayLength = 1 + (int) (xMax / positionDifference);
-        yArrayLength = 1 + (int) (yMax / positionDifference);
+        xArrayLength = 1 + (int) (xMax / IndoorPositioningSettings.referencePointDistance);
+        yArrayLength = 1 + (int) (yMax / IndoorPositioningSettings.referencePointDistance);
 
         this.data = (T[][]) Array.newInstance(TClass, yArrayLength, xArrayLength);
         for (Position position : data.keySet()) {
@@ -41,11 +40,11 @@ public class RoomMatrix<T> {
     }
 
     private int positionToXIndex(Position position) {
-        return (int) Math.round(position.x / positionDifference);
+        return (int) Math.round(position.x / IndoorPositioningSettings.referencePointDistance);
     }
 
     private int positionToYIndex(Position position) {
-        return (int) Math.round(position.y / positionDifference);
+        return (int) Math.round(position.y / IndoorPositioningSettings.referencePointDistance);
     }
 
     public T getValueAtPosition(Position position) {

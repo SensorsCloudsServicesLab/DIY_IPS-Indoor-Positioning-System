@@ -23,6 +23,7 @@ import java.util.List;
 
 import indoorpositioningmodel.DatabaseWrapper;
 import indoorpositioningmodel.DirectionManager;
+import indoorpositioningmodel.IndoorPositioningSettings;
 
 public class CollectRSSIDataActivity extends AppCompatActivity {
 
@@ -46,7 +47,6 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     private final float y_increment = 1f;
 
     private int currentAutoRefreshIndex = 0;
-    private final int numAutoRefreshes = 25;
 
     private DatabaseWrapper database = new DatabaseWrapper(this);
 
@@ -134,7 +134,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         public void onReceive(Context c, Intent intent) {
             // This condition is not necessary if you listen to only one action
             if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-                if (currentAutoRefreshIndex >= numAutoRefreshes) {
+                if (currentAutoRefreshIndex >= IndoorPositioningSettings.numObservations) {
                     autoRefreshButton.setChecked(false);
                     return;
                 }

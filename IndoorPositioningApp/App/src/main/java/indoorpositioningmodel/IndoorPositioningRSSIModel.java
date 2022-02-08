@@ -36,7 +36,6 @@ public class IndoorPositioningRSSIModel {
     private WifiManager wifiManager;
     private DirectionManager directionManager;
     private final Map<String, Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>>> distributions = new HashMap<>();
-    private final double thresholdProbabilityPercentage = 0.25; //The percentage of the highest probability that is required for the point to be treated as valid
     private RoomMatrix<Double> probabilitySums;
     private int numSamples = 0;
 
@@ -130,7 +129,7 @@ public class IndoorPositioningRSSIModel {
         int[] directions = Helpers.getClosestDirections(degreesFromNorth);
 
         //Read RSSI values
-        Map<String, Double> rssiValues = getRssiValues(true);
+        Map<String, Double> rssiValues = getRssiValues();
 
         //Get the associated maps
         Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
@@ -153,7 +152,7 @@ public class IndoorPositioningRSSIModel {
         numSamples++;
 
         Double maxProbability = probabilitySums.getMaxValue(Comparator.comparingDouble(a -> a));
-        Double thresholdProbability = maxProbability*(1-thresholdProbabilityPercentage);
+        Double thresholdProbability = maxProbability*(1-IndoorPositioningSettings.thresholdProbabilityPercentage);
         for (int row = 0; row < probabilitySums.yArrayLength; row++) {
             StringBuilder string = new StringBuilder();
             for (int col = 0; col < probabilitySums.xArrayLength; col++) {
@@ -215,9 +214,9 @@ public class IndoorPositioningRSSIModel {
         return test;
     }
 
-    public Map<String, Double> getRssiValues(boolean shouldSimulateData) {
-        if (shouldSimulateData) {
-            RoomSimulator sim = new RoomSimulator(11, 11, 50);
+    public Map<String, Double> getRssiValues() {
+        if (IndoorPositioningSettings.shouldSimulate) {
+            RoomSimulator sim = new RoomSimulator(IndoorPositioningSettings.roomWidth, IndoorPositioningSettings.roomHeight, IndoorPositioningSettings.numObservations);
             return sim.sampleRSSI(new Position(3, 4));
         }
 
@@ -239,8 +238,8 @@ public class IndoorPositioningRSSIModel {
         for (int row = 0; row < map.yArrayLength; row++) {
             for (int col = 0; col < map.xArrayLength; col++) {
                 if (map.getValueAtIndex(row, col) > threshold) {
-                    x += col*0.2;
-                    y += row*0.2;
+                    x += col * IndoorPositioningSettings.referencePointDistance;
+                    y += row * IndoorPositioningSettings.referencePointDistance;
                     numAboveThreshold++;
                 }
             }
