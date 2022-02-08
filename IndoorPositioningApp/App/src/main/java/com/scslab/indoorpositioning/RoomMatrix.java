@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class RoomMatrix<T> {
 
-    private final double positionDifference = 0.1;
+    private final double positionDifference = 0.2;
     private final T[][] data;
     public int xArrayLength;
     public int yArrayLength;

@@ -34,7 +34,7 @@ public class IndoorPositioningRSSIModel {
     private WeakReference<Activity> activityReference;
 
     private final Map<String, Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>>> distributions = new HashMap<>();
-    private final double thresholdProbabilityPercentage = 0.15; //The percentage of the highest probability that is required for the point to be treated as valid
+    private final double thresholdProbabilityPercentage = 0.4; //The percentage of the highest probability that is required for the point to be treated as valid
 
     private WifiManager wifiManager;
     private DirectionManager directionManager;
@@ -181,11 +181,17 @@ public class IndoorPositioningRSSIModel {
                     SkewGeneralizedNormalDistribution distribution2GHZ = current2GHZAccessPointDistributions.getValueAtIndex(row, col);
                     SkewGeneralizedNormalDistribution distribution5GHZ = current5GHZAccessPointDistributions.getValueAtIndex(row, col);
 
+                    if (!rssiValues.containsKey(accessPointName+"_2GHZ") && !rssiValues.containsKey(accessPointName+"_5GHZ")) {
+                        continue;
+                    }
+
                     double probability;
                     if (distribution2GHZ == null || distribution5GHZ == null) {
                         probability = 0;
                     } else {
-                        probability = distribution2GHZ.pdf(rssiValues.get(accessPointName+"_2GHZ")) * distribution5GHZ.pdf(rssiValues.get(accessPointName+"_5GHZ"));
+                        double probability2GHZ = rssiValues.containsKey(accessPointName+"_2GHZ") ? distribution2GHZ.pdf(rssiValues.get(accessPointName+"_2GHZ")) : 1;
+                        double probability5GHZ = rssiValues.containsKey(accessPointName+"_5GHZ") ? distribution5GHZ.pdf(rssiValues.get(accessPointName+"_5GHZ")) : 1;
+                        probability = probability2GHZ * probability5GHZ;
                     }
 
                     if (probabilities[row][col] == null) {
@@ -225,8 +231,8 @@ public class IndoorPositioningRSSIModel {
         for (int row = 0; row < map.yArrayLength; row++) {
             for (int col = 0; col < map.xArrayLength; col++) {
                 if (map.getValueAtIndex(row, col) > threshold) {
-                    x += col*0.1;
-                    y += row*0.1;
+                    x += col*0.2;
+                    y += row*0.2;
                     numAboveThreshold++;
                 }
             }
