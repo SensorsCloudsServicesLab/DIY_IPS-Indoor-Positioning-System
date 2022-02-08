@@ -33,11 +33,12 @@ public class IndoorPositioningRSSIModel {
 
     private WeakReference<Activity> activityReference;
 
-    private final Map<String, Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>>> distributions = new HashMap<>();
-    private final double thresholdProbabilityPercentage = 0.4; //The percentage of the highest probability that is required for the point to be treated as valid
-
     private WifiManager wifiManager;
     private DirectionManager directionManager;
+    private final Map<String, Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>>> distributions = new HashMap<>();
+    private final double thresholdProbabilityPercentage = 0.25; //The percentage of the highest probability that is required for the point to be treated as valid
+    private RoomMatrix<Double> probabilitySums;
+    private int numSamples = 0;
 
     public IndoorPositioningRSSIModel(Activity activity) {
         if (activity == null || activity.isFinishing()) {
@@ -129,7 +130,7 @@ public class IndoorPositioningRSSIModel {
         int[] directions = Helpers.getClosestDirections(degreesFromNorth);
 
         //Read RSSI values
-        Map<String, Double> rssiValues = getRssiValues(false);
+        Map<String, Double> rssiValues = getRssiValues(true);
 
         //Get the associated maps
         Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
@@ -138,23 +139,30 @@ public class IndoorPositioningRSSIModel {
         RoomMatrix<Double> xProbabilities = calculateProbabilityMap(rssiValues, xDirectionData);
         RoomMatrix<Double> yProbabilities = calculateProbabilityMap(rssiValues, yDirectionData);
 
-        double xScale = Math.pow(Math.cos(degreesFromNorth + 90), 2);
-        double yScale = Math.pow(Math.sin(degreesFromNorth + 90), 2);
-        RoomMatrix<Double> probabilities = xProbabilities.operate((int row, int col) -> {
-            return (xScale * xProbabilities.getValueAtIndex(row, col)) + (yScale * yProbabilities.getValueAtIndex(row, col));
-        });
+        double xScale = Math.pow(Math.cos(degreesFromNorth + 90), 2);;
+        double yScale = Math.pow(Math.sin(degreesFromNorth + 90), 2);;
 
-        Double maxProbability = probabilities.getMaxValue(Comparator.comparingDouble(a -> a));
+        probabilitySums = xProbabilities.operate((int row, int col) -> {
+            double scaledProbability = (xScale * xProbabilities.getValueAtIndex(row, col)) + (yScale * yProbabilities.getValueAtIndex(row, col));
+            if (numSamples == 0) {
+                return scaledProbability;
+            } else {
+                return (probabilitySums.getValueAtIndex(row, col) + scaledProbability);
+            }
+        });
+        numSamples++;
+
+        Double maxProbability = probabilitySums.getMaxValue(Comparator.comparingDouble(a -> a));
         Double thresholdProbability = maxProbability*(1-thresholdProbabilityPercentage);
-        for (int row = 0; row < probabilities.yArrayLength; row++) {
+        for (int row = 0; row < probabilitySums.yArrayLength; row++) {
             StringBuilder string = new StringBuilder();
-            for (int col = 0; col < probabilities.xArrayLength; col++) {
-                string.append(probabilities.getValueAtIndex(row, col) > thresholdProbability ? "#," : " ,");
+            for (int col = 0; col < probabilitySums.xArrayLength; col++) {
+                string.append(probabilitySums.getValueAtIndex(row, col) > thresholdProbability ? "#," : " ,");
             }
             Log.d("Riccardo", string.toString());
         }
 
-        return calcCentroid(probabilities, thresholdProbability);
+        return calcCentroid(probabilitySums, thresholdProbability);
     }
 
     public RoomMatrix<Double> calculateProbabilityMap(Map<String, Double> rssiValues, Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> accessPointData) {
@@ -209,7 +217,7 @@ public class IndoorPositioningRSSIModel {
 
     public Map<String, Double> getRssiValues(boolean shouldSimulateData) {
         if (shouldSimulateData) {
-            RoomSimulator sim = new RoomSimulator(8, 8, 50);
+            RoomSimulator sim = new RoomSimulator(11, 11, 50);
             return sim.sampleRSSI(new Position(3, 4));
         }
 
