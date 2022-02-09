@@ -8,8 +8,18 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.scslab.indoorpositioning.R;
+
 public class AccelerometerManager implements SensorEventListener {
 
+    private GraphView graphView;
+    private LineGraphSeries<DataPoint> accelerationSeries;
+    private Long startTime = null;
+
+    private final int graphMaxWidth = 100;
     private final SensorManager sensorManager;
     private final Sensor accelerometerSensor;
     private final Sensor gravitySensor;
@@ -39,6 +49,14 @@ public class AccelerometerManager implements SensorEventListener {
         gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
         magneticSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         rotationSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+        DataPoint[] graphSeriesData = new DataPoint[this.graphMaxWidth];
+        for (int i = -1 * this.graphMaxWidth; i < 0; i++) {
+            graphSeriesData[this.graphMaxWidth+i] = new DataPoint(i, 0);
+        }
+        accelerationSeries = new LineGraphSeries<>(graphSeriesData);
+        graphView = (GraphView) activity.findViewById(R.id.acceleration_graph);
+        graphView.addSeries(accelerationSeries);
     }
 
     public void onPause() {
@@ -46,9 +64,9 @@ public class AccelerometerManager implements SensorEventListener {
     }
 
     public void onResume() {
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this, magneticSensor, SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this, rotationSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -84,6 +102,13 @@ public class AccelerometerManager implements SensorEventListener {
                 android.opengl.Matrix.invertM(inv, 0, R, 0);
                 android.opengl.Matrix.multiplyMV(earthAcc, 0, inv, 0, deviceRelativeAcceleration, 0);
                 Log.d("Acceleration", "Values: (" + earthAcc[0] + ", " + earthAcc[1] + ", " + earthAcc[2] + ")");
+
+                Long currentTime = System.currentTimeMillis();
+                if (startTime == null) {
+                    startTime = currentTime;
+                }
+
+                accelerationSeries.appendData(new DataPoint(currentTime - startTime, earthAcc[2]), false, 25);
             }
 
         } else if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
