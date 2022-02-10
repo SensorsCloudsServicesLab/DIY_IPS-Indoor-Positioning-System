@@ -75,6 +75,20 @@ public class AccelerometerManager implements SensorEventListener {
 
     }
 
+    float lastTimestamp = 0;
+
+    float prevAccelX = 0;
+    float prevAccelY = 0;
+    float prevAccelZ = 0;
+
+    double velX = 0;
+    double velY = 0;
+    double velZ = 0;
+
+    float distX = 0;
+    float distY = 0;
+    float distZ = 0;
+
     @Override
     public void onSensorChanged(SensorEvent event) {
 
@@ -94,21 +108,45 @@ public class AccelerometerManager implements SensorEventListener {
 
                 float[] R = new float[16];
                 float[] I = new float[16];
-                float[] earthAcc = new float[16];
+                float[] earthAcceleration = new float[16];
 
                 SensorManager.getRotationMatrix(R, I, gravityValues, magneticValues);
 
                 float[] inv = new float[16];
                 android.opengl.Matrix.invertM(inv, 0, R, 0);
-                android.opengl.Matrix.multiplyMV(earthAcc, 0, inv, 0, deviceRelativeAcceleration, 0);
-                Log.d("Acceleration", "Values: (" + earthAcc[0] + ", " + earthAcc[1] + ", " + earthAcc[2] + ")");
+                android.opengl.Matrix.multiplyMV(earthAcceleration, 0, inv, 0, deviceRelativeAcceleration, 0);
+                Log.d("Acceleration", "Values: (" + earthAcceleration[0] + ", " + earthAcceleration[1] + ", " + earthAcceleration[2] + ")");
 
                 Long currentTime = System.currentTimeMillis();
                 if (startTime == null) {
                     startTime = currentTime;
                 }
 
-                accelerationSeries.appendData(new DataPoint(currentTime - startTime, earthAcc[2]), false, 25);
+                accelerationSeries.appendData(new DataPoint(currentTime - startTime, earthAcceleration[2]), false, 25);
+
+                if(lastTimestamp == 0) {
+                    lastTimestamp = event.timestamp;
+                    return;
+                }
+
+                double deltaTime = (event.timestamp - lastTimestamp)/Math.pow(10, 9);
+                lastTimestamp = event.timestamp;
+
+                velX += earthAcceleration[0] * deltaTime;
+                velY += earthAcceleration[1] * deltaTime;
+                velZ += earthAcceleration[2] * deltaTime;
+
+                distX += velX * deltaTime;
+                distY += velY * deltaTime;
+                distZ += velZ * deltaTime;
+
+
+                Log.d("Position", distX + ", " + distY + ", " + distZ);
+
+                prevAccelX = earthAcceleration[0];
+                prevAccelY = earthAcceleration[1];
+                prevAccelZ = earthAcceleration[2];
+
             }
 
         } else if (event.sensor.getType() == Sensor.TYPE_GRAVITY) {
