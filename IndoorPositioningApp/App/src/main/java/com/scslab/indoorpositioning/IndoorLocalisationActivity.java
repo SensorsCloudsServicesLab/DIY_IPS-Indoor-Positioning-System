@@ -9,9 +9,7 @@ import indoorpositioningmodel.IndoorPositioningModel;
 import indoorpositioningmodel.IndoorPositioningVisualiser;
 import indoorpositioningmodel.Position;
 
-public class IndoorLocalisationActivity extends AppCompatActivity {
-
-    private Button checkLocationButton;
+public class IndoorLocalisationActivity extends AppCompatActivity implements IndoorPositioningModel.UpdatePositionCallback {
 
     private IndoorPositioningModel indoorPositioningModel;
     private IndoorPositioningVisualiser indoorVisualiser;
@@ -22,15 +20,10 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_indoor_localisation);
 
         //Init UI
-        this.checkLocationButton = findViewById(R.id.check_location_button);
         this.indoorVisualiser = new IndoorPositioningVisualiser(this);
-        checkLocationButton.setOnClickListener(v -> {
-            Position position = indoorPositioningModel.getCurrentPosition();
-            indoorVisualiser.setMarkerPosition(position.x,position.y);
-        });
 
         //Initialisations
-        indoorPositioningModel = new IndoorPositioningModel(this);
+        this.indoorPositioningModel = new IndoorPositioningModel(this, this);
     }
 
     protected void onResume() {
@@ -43,4 +36,10 @@ public class IndoorLocalisationActivity extends AppCompatActivity {
         indoorPositioningModel.onPause();
     }
 
+    @Override
+    public void onPositionUpdate(Position position) {
+        if (indoorVisualiser != null) {
+            indoorVisualiser.setMarkerPosition(position.x,position.y);
+        }
+    }
 }

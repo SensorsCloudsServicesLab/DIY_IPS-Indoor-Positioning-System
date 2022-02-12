@@ -67,18 +67,13 @@
                 android:text="(0, 0)"/>
 
             <Button
-                android:id="@+id/check_location_button"
+                android:id="@+id/init_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
                 android:layout_marginEnd="40dp"
-                android:text="@string/refresh"
+                android:text="@string/init"
                 tools:ignore="TextContrastCheck" />
-            
-            <com.jjoe64.graphview.GraphView
-                android:id="@+id/acceleration_graph"
-                android:layout_width="match_parent"
-                android:layout_height="150dp" />
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
