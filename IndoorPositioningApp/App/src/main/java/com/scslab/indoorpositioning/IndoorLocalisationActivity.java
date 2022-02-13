@@ -5,11 +5,12 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import indoorpositioningmodel.DirectionManager;
 import indoorpositioningmodel.IndoorPositioningModel;
 import indoorpositioningmodel.IndoorPositioningVisualiser;
 import indoorpositioningmodel.Position;
 
-public class IndoorLocalisationActivity extends AppCompatActivity implements IndoorPositioningModel.UpdatePositionCallback {
+public class IndoorLocalisationActivity extends AppCompatActivity implements IndoorPositioningModel.UpdatePositionCallback, DirectionManager.OnDirectionChangedCallback {
 
     private IndoorPositioningModel indoorPositioningModel;
     private IndoorPositioningVisualiser indoorVisualiser;
@@ -23,7 +24,7 @@ public class IndoorLocalisationActivity extends AppCompatActivity implements Ind
         this.indoorVisualiser = new IndoorPositioningVisualiser(this);
 
         //Initialisations
-        this.indoorPositioningModel = new IndoorPositioningModel(this, this);
+        this.indoorPositioningModel = new IndoorPositioningModel(this, this, this);
     }
 
     protected void onResume() {
@@ -39,7 +40,14 @@ public class IndoorLocalisationActivity extends AppCompatActivity implements Ind
     @Override
     public void onPositionUpdate(Position position) {
         if (indoorVisualiser != null) {
-            indoorVisualiser.setMarkerPosition(position.x,position.y);
+            indoorVisualiser.setMarkerPosition(position);
+        }
+    }
+
+    @Override
+    public void onDirectionChanged(double angleFromNorth) {
+        if (indoorVisualiser != null) {
+            indoorVisualiser.setMarkerRotation((angleFromNorth*Math.PI/180)+(Math.PI/2));
         }
     }
 }

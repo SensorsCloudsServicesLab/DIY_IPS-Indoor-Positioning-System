@@ -32,5 +32,5 @@ public class IndoorPositioningSettings {
      * a) The Process Distributions function generates simulated data instead of pulling it from the database
      * b) The observed RSSI values are simulated in the Indoor Localisation Activity
      */
-    public static final boolean shouldSimulate = false;
+    public static final boolean shouldSimulate = true;
 }

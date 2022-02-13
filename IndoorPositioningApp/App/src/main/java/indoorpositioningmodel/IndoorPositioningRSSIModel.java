@@ -47,7 +47,7 @@ public class IndoorPositioningRSSIModel {
 
         this.activityReference = new WeakReference<>(activity);
         this.wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        this.directionManager = new DirectionManager(activity);
+        this.directionManager = new DirectionManager(activity, null);
 
         new Thread(() -> {
             activity.runOnUiThread(() -> Toast.makeText(activity, "Importing Data...", Toast.LENGTH_SHORT).show());

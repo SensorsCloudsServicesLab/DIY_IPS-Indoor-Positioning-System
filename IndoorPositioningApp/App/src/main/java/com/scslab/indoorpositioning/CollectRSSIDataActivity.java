@@ -71,7 +71,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         //Initialisations
         initUI();
         initNetwork();
-        this.directionManager = new DirectionManager(this);
+        this.directionManager = new DirectionManager(this, null);
 
         //Update the network info
         getLocationData();

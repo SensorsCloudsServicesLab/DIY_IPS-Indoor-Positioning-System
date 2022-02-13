@@ -8,39 +8,64 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.scslab.indoorpositioning.R;
 
+//TODO add these fields to settings
 public class IndoorPositioningVisualiser {
 
-    private TextView positionTextView;
-    private ImageView floorPlanImageView;
-    private ImageView positionMarkerImageView;
+    private final TextView positionTextView;
+    private final ImageView floorPlanImageView;
+    private final ImageView positionMarkerImageView;
+    private final ImageView rotationMarkerImageView;
 
     private final double roomWidth = 13.5;
     private final double roomHeight = 13.5;
     private final Position roomTopLeft = new Position(0.009, 0.009);  //in percentage
     private final Position roomBottomRight = new Position(0.964, 0.977); //in percentage
 
+    private Position currentPosition;
+    private double currentAngle = 0;
+
     public IndoorPositioningVisualiser(Activity activity) {
         this.positionTextView = activity.findViewById(R.id.position);
         this.floorPlanImageView = activity.findViewById(R.id.floor_plan);
         this.positionMarkerImageView = activity.findViewById(R.id.position_marker);
-        this.setMarkerPosition(0, 0);
+        this.rotationMarkerImageView = activity.findViewById(R.id.rotation_marker);
+        this.setMarkerPosition(new Position(0, 0));
     }
 
-    public void setMarkerPosition(double x, double y) {
-        this.positionTextView.setText("(" + (Math.round(x*100)/100.0) + ", " + (Math.round(y*100)/100.0) + ")");
+    public void setMarkerPosition(Position position) {
+        this.currentPosition = position;
+        updateMarker();
+    }
 
+    public void setMarkerRotation(double angleInRadians) {
+        this.currentAngle = angleInRadians;
+        updateMarker();
+    }
+
+    private void updateMarker() {
         float roomWidthPixels = floorPlanImageView.getWidth();
         float roomHeightPixels = floorPlanImageView.getHeight();
 
         double leftPadding = roomTopLeft.x * roomWidthPixels;
         double topPadding = roomTopLeft.y * roomHeightPixels;
 
-        int xPos = (int) (leftPadding + ((x/roomWidth) * roomBottomRight.x * roomWidthPixels));
-        int yPos = (int) (topPadding + ((y/roomHeight) * roomBottomRight.y * roomHeightPixels));
+        int xPos = (int) (leftPadding + ((currentPosition.x/roomWidth) * roomBottomRight.x * roomWidthPixels));
+        int yPos = (int) (topPadding + ((currentPosition.y/roomHeight) * roomBottomRight.y * roomHeightPixels));
+
+        //xPos and yPos are the pixel positions of the marker. now we offset the direction marker
+        int rotationMarkerXPos = (int) (xPos + (24 * Math.cos(this.currentAngle)));
+        int rotationMarkerYPos = (int) (yPos + (24 * Math.sin(this.currentAngle)));
+
+        //Update UI:
+        this.positionTextView.setText("(" + (Math.round(currentPosition.x*100)/100.0) + ", " + (Math.round(currentPosition.y*100)/100.0) + ")");
 
         ConstraintLayout.LayoutParams markerLayoutParams = (ConstraintLayout.LayoutParams) positionMarkerImageView.getLayoutParams();
         markerLayoutParams.setMargins(xPos - positionMarkerImageView.getWidth()/2, yPos - positionMarkerImageView.getHeight()/2, 0, 0);
         positionMarkerImageView.setLayoutParams(markerLayoutParams);
+
+        ConstraintLayout.LayoutParams rotationMarkerLayoutParams = (ConstraintLayout.LayoutParams) rotationMarkerImageView.getLayoutParams();
+        rotationMarkerLayoutParams.setMargins(rotationMarkerXPos - rotationMarkerImageView.getWidth()/2, rotationMarkerYPos - rotationMarkerImageView.getHeight()/2, 0, 0);
+        rotationMarkerImageView.setLayoutParams(rotationMarkerLayoutParams);
     }
 
 
