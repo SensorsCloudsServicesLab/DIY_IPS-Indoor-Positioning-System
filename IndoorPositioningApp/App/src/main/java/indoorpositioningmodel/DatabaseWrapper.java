@@ -10,7 +10,16 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,10 +44,12 @@ public class DatabaseWrapper {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private WeakReference<Activity> activityWeakReference;
+    private JSONArray localRecords;
 
     public DatabaseWrapper(Activity activity) {
         FirebaseApp.initializeApp(activity);
         this.activityWeakReference = new WeakReference<>(activity);
+        loadLocalRecords();
     }
 
     /*
@@ -80,46 +91,144 @@ public class DatabaseWrapper {
         ]
     }
      */
-    public void addFingerprintRecord(float ref_x, float ref_y, float angle, List<ScanResult> wifiList) {
-        Map<String, Object> record = new HashMap<>();
-        record.put("reference_x", ref_x);
-        record.put("reference_y", ref_y);
-        record.put("angle", angle);
-
-        List<Object> rssi_observation_list = new ArrayList<Object>();
-
-        for (ScanResult scanResult : wifiList) {
-            if (!scanResult.SSID.isEmpty() && scanResult.SSID.contains("SCSLAB_AP")) {
-                Map<String, Object> rssi_record = new HashMap<>();
-                rssi_record.put("SSID", scanResult.SSID);
-                rssi_record.put("RSSI", scanResult.level);
-                rssi_record.put("frequency", scanResult.frequency);
-                rssi_observation_list.add(rssi_record);
-            }
+    private void loadLocalRecords() {
+        Activity activity = activityWeakReference.get();
+        if (activity == null || activity.isFinishing()) {
+            return;
         }
 
-        record.put("rssi_observations", rssi_observation_list);
+        localRecords = new JSONArray();
+        File path = activity.getExternalFilesDir(null);
+        File localRecordsFile = new File(path, "local_records.json");
 
-        db.collection("rssi_records").document("("+ref_x+","+ref_y+")").collection("records")
-                .add(record)
-                .addOnSuccessListener((DocumentReference documentReference) -> {
-                    Activity activity = activityWeakReference.get();
-                    if (activity != null && !activity.isFinishing()) {
-                        ToastManager.showToast(activity, "Recorded with ID: " + documentReference.getId());
-                    }
-                    Log.d(TAG, "Recorded with ID: " + documentReference.getId());
-                })
-                .addOnFailureListener((@NonNull Exception e) -> {
-                    Activity activity = activityWeakReference.get();
-                    if (activity != null && !activity.isFinishing()) {
-                        ToastManager.showToast(activity, "Error adding record");
-                    }
-                    Log.d(TAG, e.getMessage());
-                    e.printStackTrace();
-                });
+        try {
+            int length = (int) localRecordsFile.length();
+            byte[] bytes = new byte[length];
+            FileInputStream in = new FileInputStream(localRecordsFile);
+            in.read(bytes);
+            in.close();
+
+            String localRecordsString = new String(bytes);
+            localRecords = new JSONArray(localRecordsString);
+
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    static int num = 0;
+    public void saveLocalRecords() {
+        Activity activity = activityWeakReference.get();
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
+
+        String localRecordsString = localRecords.toString();
+        File path = activity.getApplicationContext().getExternalFilesDir(null);
+        File localRecordsFile = new File(path, "local_records.json");
+
+        FileOutputStream stream;
+        try {
+            stream = new FileOutputStream(localRecordsFile);
+            stream.write(localRecordsString.getBytes());
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void storeLocalFingerprintRecord(float ref_x, float ref_y, float angle, List<ScanResult> wifiList) {
+        JSONObject newRecord = new JSONObject();
+        try {
+            newRecord.put("ref_x", ref_x);
+            newRecord.put("ref_y", ref_y);
+            newRecord.put("angle", angle);
+
+            JSONArray rssiObservations = new JSONArray();
+            for (ScanResult scanResult : wifiList) {
+                if (!scanResult.SSID.isEmpty() && scanResult.SSID.contains("SCSLAB_AP")) {
+                    Map<String, Object> rssiRecord = new HashMap<>();
+                    rssiRecord.put("SSID", scanResult.SSID);
+                    rssiRecord.put("RSSI", scanResult.level);
+                    rssiRecord.put("frequency", scanResult.frequency);
+                    rssiObservations.put(rssiRecord);
+                }
+            }
+            newRecord.put("rssi_observations", rssiObservations);
+
+            localRecords.put(newRecord);
+
+            Activity activity = activityWeakReference.get();
+            if (activity == null || activity.isFinishing()) {
+                return;
+            }
+            ToastManager.showToast(activity, "Stored Local Fingerprint (Time: " + System.currentTimeMillis() + ")");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        saveLocalRecords();
+    }
+
+    public void uploadLocalRecords(String collectionName) {
+        Activity activity = activityWeakReference.get();
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
+
+        // Get a new write batch
+        WriteBatch batch = db.batch();
+
+        try {
+            for (int i = 0; i < localRecords.length(); i++) {
+                JSONObject localRecord = localRecords.getJSONObject(i);
+                double ref_x = localRecord.getDouble("ref_x");
+                double ref_y = localRecord.getDouble("ref_y");
+
+                Map<String, Object> uploadData = new HashMap<>();
+                uploadData.put("reference_x", ref_x);
+                uploadData.put("reference_y", ref_y);
+                uploadData.put("angle", localRecord.get("angle"));
+
+                List<Object> rssiObservations = new ArrayList<Object>();
+                for (int j = 0; j < localRecord.getJSONArray("rssi_observations").length(); j++) {
+                    JSONObject currentObservation = localRecord.getJSONArray("rssi_observations").getJSONObject(j);
+
+                    Map<String, Object> rssi_record = new HashMap<>();
+                    rssi_record.put("SSID", currentObservation.get("SSID"));
+                    rssi_record.put("RSSI", currentObservation.get("RSSI"));
+                    rssi_record.put("frequency", currentObservation.get("frequency"));
+                    rssiObservations.add(rssi_record);
+                }
+
+                uploadData.put("rssi_observations", rssiObservations);
+
+                DocumentReference documentReference = db
+                        .collection(collectionName)
+                        .document("("+ref_x+","+ref_y+")")
+                        .collection("records")
+                        .document();
+
+                batch.set(documentReference, uploadData);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        // Commit the batch
+        batch.commit().addOnSuccessListener((result) -> {
+            Activity currentActivity = activityWeakReference.get();
+            if (currentActivity != null && !currentActivity.isFinishing()) {
+                ToastManager.showToast(currentActivity, "Recorded " + localRecords.length() + " observations");
+            }
+        }).addOnFailureListener((@NonNull Exception e) -> {
+            Activity currentActivity = activityWeakReference.get();
+            if (currentActivity != null && !currentActivity.isFinishing()) {
+                ToastManager.showToast(currentActivity, "Error uploading data");
+            }
+            Log.d(TAG, e.getMessage());
+            e.printStackTrace();
+        });
+    }
 
     public void getRSSIDataFromDatabase(OnCompleteListener onCompleteListener) {
 

@@ -37,6 +37,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     private Button downArrowButton;
     private Button leftArrowButton;
     private Button rightArrowButton;
+    private Button uploadDataButton;
 
     private ListView networkListView;
     private WifiManager wifiManager;
@@ -48,7 +49,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
 
     private int currentAutoRefreshIndex = 0;
 
-    private DatabaseWrapper database = new DatabaseWrapper(this);
+    private DatabaseWrapper database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +68,10 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         this.downArrowButton = findViewById(R.id.down_arrow);
         this.leftArrowButton = findViewById(R.id.left_arrow);
         this.rightArrowButton = findViewById(R.id.right_arrow);
+        this.uploadDataButton = findViewById(R.id.upload_data);
 
         //Initialisations
+        this.database = new DatabaseWrapper(this);
         initUI();
         initNetwork();
         this.directionManager = new DirectionManager(this, null);
@@ -90,6 +93,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         downArrowButton.setOnClickListener(v -> addFloatToEditText(reference_y_edit_text, -y_increment));
         leftArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, -x_increment));
         rightArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, x_increment));
+        uploadDataButton.setOnClickListener(v -> database.uploadLocalRecords("rssi_records_2"));
     }
 
     private void addFloatToEditText(EditText edittext, Float value) {
@@ -126,7 +130,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         float ref_x = Float.parseFloat(reference_x_edit_text.getText().toString());
         float ref_y = Float.parseFloat(reference_y_edit_text.getText().toString());
         float angle = Float.parseFloat(angle_edit_text.getText().toString());
-        database.addFingerprintRecord(ref_x, ref_y, angle, wifiList);
+        database.storeLocalFingerprintRecord(ref_x, ref_y, angle, wifiList);
     }
 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
