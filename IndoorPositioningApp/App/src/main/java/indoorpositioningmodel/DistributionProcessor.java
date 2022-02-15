@@ -42,7 +42,7 @@ public class DistributionProcessor {
                 Map<Position, List<Double>> accessPointData = RSSIData.get(accessPointName);
                 for (Position position : accessPointData.keySet()) {
                     double[] positionRSSIData = accessPointData.get(position).stream().mapToDouble(i -> i).toArray();
-                    if (positionRSSIData.length < 2) {
+                    if (positionRSSIData.length < 9) {
                         continue; //not enough data to fit a regression model -> throws an exception
                     }
 
