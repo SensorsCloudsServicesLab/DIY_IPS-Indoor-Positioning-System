@@ -146,7 +146,7 @@ public class DatabaseWrapper {
             JSONArray rssiObservations = new JSONArray();
             for (ScanResult scanResult : wifiList) {
                 if (!scanResult.SSID.isEmpty() && scanResult.SSID.contains("SCSLAB_AP")) {
-                    Map<String, Object> rssiRecord = new HashMap<>();
+                    JSONObject rssiRecord = new JSONObject();
                     rssiRecord.put("SSID", scanResult.SSID);
                     rssiRecord.put("RSSI", scanResult.level);
                     rssiRecord.put("frequency", scanResult.frequency);
@@ -212,6 +212,8 @@ public class DatabaseWrapper {
             }
         } catch (JSONException e) {
             e.printStackTrace();
+            ToastManager.showToast(activity, "JSON Exception");
+            return;
         }
 
         // Commit the batch
