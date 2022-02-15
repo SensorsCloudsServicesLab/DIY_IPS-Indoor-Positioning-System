@@ -34,6 +34,17 @@ public class IndoorPositioningSettings {
      */
     public static final boolean SHOULD_SIMULATE = true;
 
+    //TODO: use these
+    /**
+     * If the x axis has been defined as the opposite as the normal direction, you change this to -1
+     */
+    public static final double PDR_X_AXIS_FLIP = 1;
+
+    /**
+     * If the y axis has been defined as the opposite as the normal direction, you change this to -1
+     */
+    public static final double PDR_Y_AXIS_FLIP = -1;
+
     /**
      * The below settings help map positions to the image in the indoor positioning activity.
      * This must only be changed if the floor plan image changes.
