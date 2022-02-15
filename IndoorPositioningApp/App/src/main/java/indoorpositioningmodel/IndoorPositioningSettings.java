@@ -2,6 +2,8 @@ package indoorpositioningmodel;
 
 public class IndoorPositioningSettings {
 
+    public static final String RSSI_OBSERVATIONS_COLLECTION_NAME = "rssi_records_2";
+
     /**
      * The highest x value of all reference points
      */

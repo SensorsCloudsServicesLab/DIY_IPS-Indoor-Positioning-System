@@ -93,7 +93,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         downArrowButton.setOnClickListener(v -> addFloatToEditText(reference_y_edit_text, -y_increment));
         leftArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, -x_increment));
         rightArrowButton.setOnClickListener(v -> addFloatToEditText(reference_x_edit_text, x_increment));
-        uploadDataButton.setOnClickListener(v -> database.uploadLocalRecords("rssi_records_2"));
+        uploadDataButton.setOnClickListener(v -> database.uploadLocalRecords(IndoorPositioningSettings.RSSI_OBSERVATIONS_COLLECTION_NAME));
     }
 
     private void addFloatToEditText(EditText edittext, Float value) {

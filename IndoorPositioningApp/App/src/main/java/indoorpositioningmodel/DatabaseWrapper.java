@@ -205,7 +205,7 @@ public class DatabaseWrapper {
                 DocumentReference documentReference = db
                         .collection(collectionName)
                         .document("("+ref_x+","+ref_y+")")
-                        .collection("records")
+                        .collection(IndoorPositioningSettings.RSSI_OBSERVATIONS_COLLECTION_NAME+"_records")
                         .document();
 
                 batch.set(documentReference, uploadData);
@@ -248,7 +248,7 @@ public class DatabaseWrapper {
         }
 
         //Read from database
-        db.collectionGroup("records")
+        db.collectionGroup(IndoorPositioningSettings.RSSI_OBSERVATIONS_COLLECTION_NAME +"_records")
             .get()
             .addOnCompleteListener((task1) -> {
                 if (task1.isSuccessful()) {
