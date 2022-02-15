@@ -24,8 +24,8 @@ public class RoomMatrix<T> {
             }
         }
 
-        xArrayLength = 1 + (int) (xMax / IndoorPositioningSettings.referencePointDistance);
-        yArrayLength = 1 + (int) (yMax / IndoorPositioningSettings.referencePointDistance);
+        xArrayLength = 1 + (int) (xMax / IndoorPositioningSettings.REFERENCE_POINT_DISTANCE);
+        yArrayLength = 1 + (int) (yMax / IndoorPositioningSettings.REFERENCE_POINT_DISTANCE);
 
         this.data = (T[][]) Array.newInstance(TClass, yArrayLength, xArrayLength);
         for (Position position : data.keySet()) {
@@ -40,11 +40,11 @@ public class RoomMatrix<T> {
     }
 
     private int positionToXIndex(Position position) {
-        return (int) Math.round(position.x / IndoorPositioningSettings.referencePointDistance);
+        return (int) Math.round(position.x / IndoorPositioningSettings.REFERENCE_POINT_DISTANCE);
     }
 
     private int positionToYIndex(Position position) {
-        return (int) Math.round(position.y / IndoorPositioningSettings.referencePointDistance);
+        return (int) Math.round(position.y / IndoorPositioningSettings.REFERENCE_POINT_DISTANCE);
     }
 
     public T getValueAtPosition(Position position) {

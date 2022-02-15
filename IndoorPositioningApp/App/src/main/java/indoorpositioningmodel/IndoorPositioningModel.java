@@ -51,7 +51,6 @@ public class IndoorPositioningModel implements IndoorPositioningPDRModel.NewStep
         this.onDirectionChangedCallback.onDirectionChanged(angleFromNorth);
     }
 
-    //TODO: We don't need both UpdatePositionCallback and NewStepCallback - they are the same
     @FunctionalInterface
     public interface UpdatePositionCallback {
         void onPositionUpdate(Position position);

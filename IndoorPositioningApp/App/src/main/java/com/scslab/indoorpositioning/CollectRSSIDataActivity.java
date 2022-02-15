@@ -138,7 +138,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
         public void onReceive(Context c, Intent intent) {
             // This condition is not necessary if you listen to only one action
             if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-                if (currentAutoRefreshIndex >= IndoorPositioningSettings.numObservations) {
+                if (currentAutoRefreshIndex >= IndoorPositioningSettings.NUM_OBSERVATIONS) {
                     autoRefreshButton.setChecked(false);
                     return;
                 }

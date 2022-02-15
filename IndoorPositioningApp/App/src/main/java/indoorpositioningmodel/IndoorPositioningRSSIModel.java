@@ -160,7 +160,7 @@ public class IndoorPositioningRSSIModel {
         numSamples++;
 
         Double maxProbability = probabilitySums.getMaxValue(Comparator.comparingDouble(a -> a));
-        Double thresholdProbability = maxProbability*(1-IndoorPositioningSettings.thresholdProbabilityPercentage);
+        Double thresholdProbability = maxProbability*(1-IndoorPositioningSettings.THRESHOLD_PROBABILITY_PERCENTAGE);
         for (int row = 0; row < probabilitySums.yArrayLength; row++) {
             StringBuilder string = new StringBuilder();
             for (int col = 0; col < probabilitySums.xArrayLength; col++) {
@@ -223,8 +223,8 @@ public class IndoorPositioningRSSIModel {
     }
 
     public Map<String, Double> getRssiValues() {
-        if (IndoorPositioningSettings.shouldSimulate) {
-            RoomSimulator sim = new RoomSimulator(IndoorPositioningSettings.roomWidth, IndoorPositioningSettings.roomHeight, IndoorPositioningSettings.numObservations);
+        if (IndoorPositioningSettings.SHOULD_SIMULATE) {
+            RoomSimulator sim = new RoomSimulator(IndoorPositioningSettings.ROOM_WIDTH, IndoorPositioningSettings.ROOM_HEIGHT, IndoorPositioningSettings.NUM_OBSERVATIONS);
             return sim.sampleRSSI(new Position(3, 4));
         }
 
@@ -246,8 +246,8 @@ public class IndoorPositioningRSSIModel {
         for (int row = 0; row < map.yArrayLength; row++) {
             for (int col = 0; col < map.xArrayLength; col++) {
                 if (map.getValueAtIndex(row, col) > threshold) {
-                    x += col * IndoorPositioningSettings.referencePointDistance;
-                    y += row * IndoorPositioningSettings.referencePointDistance;
+                    x += col * IndoorPositioningSettings.REFERENCE_POINT_DISTANCE;
+                    y += row * IndoorPositioningSettings.REFERENCE_POINT_DISTANCE;
                     numAboveThreshold++;
                 }
             }

@@ -8,18 +8,12 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.scslab.indoorpositioning.R;
 
-//TODO add these fields to settings
 public class IndoorPositioningVisualiser {
 
     private final TextView positionTextView;
     private final ImageView floorPlanImageView;
     private final ImageView positionMarkerImageView;
     private final ImageView rotationMarkerImageView;
-
-    private final double roomWidth = 13.5;
-    private final double roomHeight = 13.5;
-    private final Position roomTopLeft = new Position(0.009, 0.009);  //in percentage
-    private final Position roomBottomRight = new Position(0.964, 0.977); //in percentage
 
     private Position currentPosition;
     private double currentAngle = 0;
@@ -46,11 +40,11 @@ public class IndoorPositioningVisualiser {
         float roomWidthPixels = floorPlanImageView.getWidth();
         float roomHeightPixels = floorPlanImageView.getHeight();
 
-        double leftPadding = roomTopLeft.x * roomWidthPixels;
-        double topPadding = roomTopLeft.y * roomHeightPixels;
+        double leftPadding = IndoorPositioningSettings.ROOM_TOP_LEFT.x * roomWidthPixels;
+        double topPadding = IndoorPositioningSettings.ROOM_TOP_LEFT.y * roomHeightPixels;
 
-        int xPos = (int) (leftPadding + ((currentPosition.x/roomWidth) * roomBottomRight.x * roomWidthPixels));
-        int yPos = (int) (topPadding + ((currentPosition.y/roomHeight) * roomBottomRight.y * roomHeightPixels));
+        int xPos = (int) (leftPadding + ((currentPosition.x/IndoorPositioningSettings.VISUALISER_ROOM_WIDTH) * IndoorPositioningSettings.ROOM_BOTTOM_RIGHT.x * roomWidthPixels));
+        int yPos = (int) (topPadding + ((currentPosition.y/IndoorPositioningSettings.VISUALISER_ROOM_HEIGHT) * IndoorPositioningSettings.ROOM_BOTTOM_RIGHT.y * roomHeightPixels));
 
         //xPos and yPos are the pixel positions of the marker. now we offset the direction marker
         int rotationMarkerXPos = (int) (xPos + (24 * Math.cos(this.currentAngle)));
