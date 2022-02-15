@@ -176,7 +176,7 @@ public class DatabaseWrapper {
         }
 
         // Get a new write batch
-        WriteBatch batch = db.batch();
+        BatchGroup batchGroup = new BatchGroup(activity, db);
 
         try {
             for (int i = 0; i < localRecords.length(); i++) {
@@ -208,7 +208,7 @@ public class DatabaseWrapper {
                         .collection(IndoorPositioningSettings.RSSI_OBSERVATIONS_COLLECTION_NAME+"_records")
                         .document();
 
-                batch.set(documentReference, uploadData);
+                batchGroup.set(documentReference, uploadData);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -216,20 +216,7 @@ public class DatabaseWrapper {
             return;
         }
 
-        // Commit the batch
-        batch.commit().addOnSuccessListener((result) -> {
-            Activity currentActivity = activityWeakReference.get();
-            if (currentActivity != null && !currentActivity.isFinishing()) {
-                ToastManager.showToast(currentActivity, "Recorded " + localRecords.length() + " observations");
-            }
-        }).addOnFailureListener((@NonNull Exception e) -> {
-            Activity currentActivity = activityWeakReference.get();
-            if (currentActivity != null && !currentActivity.isFinishing()) {
-                ToastManager.showToast(currentActivity, "Error uploading data");
-            }
-            Log.d(TAG, e.getMessage());
-            e.printStackTrace();
-        });
+        batchGroup.runBatches();
     }
 
     public void getRSSIDataFromDatabase(OnCompleteListener onCompleteListener) {
