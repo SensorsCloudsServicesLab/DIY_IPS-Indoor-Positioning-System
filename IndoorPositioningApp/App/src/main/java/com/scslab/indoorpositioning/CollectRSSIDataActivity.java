@@ -78,11 +78,6 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
 
         //Update the network info
         getLocationData();
-
-        //Check Permissions
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-        }
     }
 
     private void initUI() {
@@ -110,12 +105,6 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
     }
 
     private void getLocationData() {
-        //Check Permissions
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
-            return;
-        }
-
         //WIFI Data
         wifiManager.startScan();
         wifiList = wifiManager.getScanResults();

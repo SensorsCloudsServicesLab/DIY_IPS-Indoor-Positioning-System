@@ -25,20 +25,11 @@ public class IndoorPositioningPDRModel implements SensorEventListener {
     private final NewStepCallback newStepCallback;
 
     public IndoorPositioningPDRModel(Activity activity, NewStepCallback newStepCallback, DirectionManager.OnDirectionChangedCallback onDirectionChangedCallback) {
-        requestPermissions(activity);
-
         this.activityReference = new WeakReference<>(activity);
         this.sensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
         this.stepDetectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
         this.newStepCallback = newStepCallback;
         this.directionManager = new DirectionManager(activity, onDirectionChangedCallback);
-    }
-
-    public void requestPermissions(Activity activity) {
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACTIVITY_RECOGNITION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.ACTIVITY_RECOGNITION}, 0);
-        }
     }
 
     public void onPause() {

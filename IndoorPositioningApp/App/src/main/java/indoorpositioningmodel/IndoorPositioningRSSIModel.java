@@ -43,7 +43,6 @@ public class IndoorPositioningRSSIModel {
         if (activity == null || activity.isFinishing()) {
             return;
         }
-        requestPermissions(activity);
 
         this.activityReference = new WeakReference<>(activity);
         this.wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
@@ -57,13 +56,6 @@ public class IndoorPositioningRSSIModel {
             distributions.put(DatabaseWrapper.DIRECTION_NAMES[DatabaseWrapper.DIRECTION_WEST], importDistributions(DatabaseWrapper.DIRECTION_WEST));
             activity.runOnUiThread(() -> Toast.makeText(activity, "Init Complete.", Toast.LENGTH_SHORT).show());
         }).start();
-    }
-
-    public void requestPermissions(Activity activity) {
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_WIFI_STATE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[] {Manifest.permission.ACCESS_WIFI_STATE}, 0);
-        }
     }
 
     public Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> importDistributions(int direction) {
@@ -123,12 +115,6 @@ public class IndoorPositioningRSSIModel {
     public Position getLocation() {
         Activity activity = activityReference.get();
         if (activity == null || activity.isFinishing()) {
-            return null;
-        }
-
-        //Check Permissions
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
             return null;
         }
 

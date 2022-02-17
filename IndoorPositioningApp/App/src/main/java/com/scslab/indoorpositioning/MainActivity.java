@@ -1,10 +1,14 @@
 package com.scslab.indoorpositioning;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.widget.Button;
 import android.widget.Toast;
@@ -39,15 +43,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void initUI() {
         collectRSSIDataButton.setOnClickListener(v -> {
+            if (!requestPermissions()) return;
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] {}, 0);
+            }
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] {}, 0);
+            }
+
             Intent myIntent = new Intent(getApplicationContext(), CollectRSSIDataActivity.class);
             startActivity(myIntent);
         });
 
         processDistributionsButton.setOnClickListener(v -> {
+            if (!requestPermissions()) return;
+
             processDataDistributions();
         });
 
         processRegressionButton.setOnClickListener(v -> {
+            if (!requestPermissions()) return;
+
             new AlertDialog.Builder(this)
                 .setMessage("Please run the python script in the repository to continue.")
                 .setPositiveButton("OK", null)
@@ -55,9 +75,26 @@ public class MainActivity extends AppCompatActivity {
         });
 
         indoorLocalisationButton.setOnClickListener(v -> {
+            if (!requestPermissions()) return;
+
             Intent myIntent = new Intent(getApplicationContext(), IndoorLocalisationActivity.class);
             startActivity(myIntent);
         });
+    }
+
+    private boolean requestPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACTIVITY_RECOGNITION,
+                    Manifest.permission.ACCESS_WIFI_STATE
+            }, 0);
+            return false;
+        }
+        return true;
     }
 
     public void processDataDistributions() {
