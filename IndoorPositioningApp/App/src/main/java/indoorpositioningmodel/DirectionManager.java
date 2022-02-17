@@ -7,11 +7,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import com.scslab.indoorpositioning.R;
+
 public class DirectionManager implements SensorEventListener {
 
     private float[] mGravity;
     private float[] mGeomagnetic;
     private float currentDegreesFromNorth = 0f;
+    private double calibrationAngle = 180;
 
     private final SensorManager sensorManager;
     private final Sensor accelerometerSensor;
@@ -23,10 +26,14 @@ public class DirectionManager implements SensorEventListener {
         this.accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         this.magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         this.onDirectionChangedCallback = onDirectionChangedCallback;
+
+        activity.findViewById(R.id.calibrate_north).setOnClickListener((v) -> {
+            this.calibrateNorth();
+        });
     }
 
     public float getCurrentDegreesFromNorth() {
-        return (float) (IndoorPositioningSettings.PDR_X_AXIS_FLIP * this.currentDegreesFromNorth);
+        return (float) (IndoorPositioningSettings.PDR_X_AXIS_FLIP * (this.currentDegreesFromNorth - calibrationAngle));
     }
 
     public void onPause() {
@@ -70,6 +77,11 @@ public class DirectionManager implements SensorEventListener {
                 }
             }
         }
+    }
+
+    private void calibrateNorth() {
+        this.calibrationAngle = 180 + this.currentDegreesFromNorth;
+        onDirectionChangedCallback.onDirectionChanged(getCurrentDegreesFromNorth());
     }
 
     @FunctionalInterface
