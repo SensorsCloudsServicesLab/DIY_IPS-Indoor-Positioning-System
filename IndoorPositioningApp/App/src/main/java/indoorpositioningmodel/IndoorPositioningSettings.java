@@ -2,7 +2,7 @@ package indoorpositioningmodel;
 
 public class IndoorPositioningSettings {
 
-    public static final String RSSI_OBSERVATIONS_COLLECTION_NAME = "rssi_records_2";
+    public static final String RSSI_OBSERVATIONS_COLLECTION_NAME = "rssi_records_3";
 
     /**
      * The highest x value of all reference points
@@ -17,7 +17,7 @@ public class IndoorPositioningSettings {
     /**
      * The difference between reference points when measuring (For the simulator)
      */
-    public static final double REFERENCE_POINT_MEASURED_DISTANCE = 0.5;
+    public static final double REFERENCE_POINT_MEASURED_DISTANCE = 1;
 
     /**
      * The difference between reference points after GPR has been applied
@@ -39,7 +39,7 @@ public class IndoorPositioningSettings {
      * a) The Process Distributions function generates simulated data instead of pulling it from the database
      * b) The observed RSSI values are simulated in the Indoor Localisation Activity
      */
-    public static final boolean SHOULD_SIMULATE = true;
+    public static final boolean SHOULD_SIMULATE = false;
 
     //TODO: use these
     /**
