@@ -28,6 +28,7 @@ public class IndoorPositioningModel implements IndoorPositioningPDRModel.NewStep
         //TODO: tell the user to stay still and take 5 rssi samples for a more accurate starting position
         activity.findViewById(R.id.init_button).setOnClickListener((v) -> {
             this.currentPosition = rssiModel.getLocation();
+            this.updatePositionCallback.onPositionUpdate(this.currentPosition);
         });
     }
 

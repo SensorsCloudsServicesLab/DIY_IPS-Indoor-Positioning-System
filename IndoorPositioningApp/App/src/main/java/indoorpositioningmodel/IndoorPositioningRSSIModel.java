@@ -133,28 +133,23 @@ public class IndoorPositioningRSSIModel {
         }
 
         //Look up the closest x and y directions
-        float degreesFromNorth = directionManager.getCurrentDegreesFromNorth();
-        int[] directions = Helpers.getClosestDirections(degreesFromNorth);
+        double degreesFromNorth = directionManager.getCurrentDegreesFromNorth();
+        int direction = Helpers.getDirection(degreesFromNorth);
 
         //Read RSSI values
         Map<String, Double> rssiValues = getRssiValues();
 
         //Get the associated maps
-        Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> xDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[0]]);
-        Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> yDirectionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[directions[1]]);
+        Map<String, RoomMatrix<SkewGeneralizedNormalDistribution>> directionData = distributions.get(DatabaseWrapper.DIRECTION_NAMES[direction]);
 
-        RoomMatrix<Double> xProbabilities = calculateProbabilityMap(rssiValues, xDirectionData);
-        RoomMatrix<Double> yProbabilities = calculateProbabilityMap(rssiValues, yDirectionData);
+        RoomMatrix<Double> probabilities = calculateProbabilityMap(rssiValues, directionData);
 
-        double xScale = Math.pow(Math.cos(degreesFromNorth + 90), 2);;
-        double yScale = Math.pow(Math.sin(degreesFromNorth + 90), 2);;
-
-        probabilitySums = xProbabilities.operate((int row, int col) -> {
-            double scaledProbability = (xScale * xProbabilities.getValueAtIndex(row, col)) + (yScale * yProbabilities.getValueAtIndex(row, col));
+        probabilitySums = probabilities.operate((int row, int col) -> {
+            double probability = probabilities.getValueAtIndex(row, col);
             if (numSamples == 0) {
-                return scaledProbability;
+                return probability;
             } else {
-                return (probabilitySums.getValueAtIndex(row, col) + scaledProbability);
+                return (probabilitySums.getValueAtIndex(row, col) + probability);
             }
         });
         numSamples++;
