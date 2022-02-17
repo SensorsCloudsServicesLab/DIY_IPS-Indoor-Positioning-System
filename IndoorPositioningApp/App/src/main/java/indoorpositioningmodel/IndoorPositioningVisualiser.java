@@ -17,6 +17,7 @@ public class IndoorPositioningVisualiser {
 
     private Position currentPosition;
     private double currentAngle = 0;
+    private double calibrationAngle = Math.PI/2;
 
     public IndoorPositioningVisualiser(Activity activity) {
         this.positionTextView = activity.findViewById(R.id.position);
@@ -24,6 +25,10 @@ public class IndoorPositioningVisualiser {
         this.positionMarkerImageView = activity.findViewById(R.id.position_marker);
         this.rotationMarkerImageView = activity.findViewById(R.id.rotation_marker);
         this.setMarkerPosition(new Position(0, 0));
+
+        activity.findViewById(R.id.calibrate_north).setOnClickListener((v) -> {
+            this.calibrateNorth();
+        });
     }
 
     public void setMarkerPosition(Position position) {
@@ -47,8 +52,8 @@ public class IndoorPositioningVisualiser {
         int yPos = (int) (topPadding + ((currentPosition.y/IndoorPositioningSettings.VISUALISER_ROOM_HEIGHT) * IndoorPositioningSettings.ROOM_BOTTOM_RIGHT.y * roomHeightPixels));
 
         //xPos and yPos are the pixel positions of the marker. now we offset the direction marker
-        int rotationMarkerXPos = (int) (xPos + (24 * Math.cos(this.currentAngle)));
-        int rotationMarkerYPos = (int) (yPos + (24 * Math.sin(this.currentAngle)));
+        int rotationMarkerXPos = (int) (xPos + (24 * Math.cos(this.currentAngle - this.calibrationAngle)));
+        int rotationMarkerYPos = (int) (yPos + (24 * Math.sin(this.currentAngle - this.calibrationAngle)));
 
         //Update UI:
         this.positionTextView.setText("(" + (Math.round(currentPosition.x*100)/100.0) + ", " + (Math.round(currentPosition.y*100)/100.0) + ")");
@@ -62,6 +67,9 @@ public class IndoorPositioningVisualiser {
         rotationMarkerImageView.setLayoutParams(rotationMarkerLayoutParams);
     }
 
-
+    private void calibrateNorth() {
+        this.calibrationAngle = Math.PI/2 + this.currentAngle;
+        updateMarker();
+    }
 
 }

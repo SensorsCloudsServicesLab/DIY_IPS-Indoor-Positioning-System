@@ -24,7 +24,6 @@ public class IndoorPositioningModel implements IndoorPositioningPDRModel.NewStep
         this.rssiModel = new IndoorPositioningRSSIModel(activity);
         this.pdrModel = new IndoorPositioningPDRModel(activity, this, this);
 
-        //First position estimation is purely based on RSSI
         activity.findViewById(R.id.init_button).setOnClickListener((v) -> {
             this.currentPosition = rssiModel.getLocation();
             this.updatePositionCallback.onPositionUpdate(this.currentPosition);

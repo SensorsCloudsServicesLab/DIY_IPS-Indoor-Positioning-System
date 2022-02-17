@@ -24,4 +24,5 @@
     <string name="floor_plan">Floor Plan</string>
     <string name="refresh_rssi_localisation">Refresh using Fingerprint</string>
     <string name="upload_data">Upload Data</string>
+    <string name="calibrate_north_direction">Calibrate North Direction</string>
 </resources>
