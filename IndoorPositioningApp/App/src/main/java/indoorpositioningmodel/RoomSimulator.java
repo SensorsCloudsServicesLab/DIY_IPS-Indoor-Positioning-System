@@ -46,8 +46,8 @@ public class RoomSimulator {
         //Fill in all the position maps
         for (String accessPointName : data.keySet()) {
             Map<Position, List<Double>> accessPointData = data.get(accessPointName);
-            for (Double x : Helpers.linearArray(0, this.roomWidth, 0.5)) {
-                for (Double y : Helpers.linearArray(0, this.roomHeight, 0.5)) {
+            for (Double x : Helpers.linearArray(0, this.roomWidth, IndoorPositioningSettings.REFERENCE_POINT_MEASURED_DISTANCE)) {
+                for (Double y : Helpers.linearArray(0, this.roomHeight, IndoorPositioningSettings.REFERENCE_POINT_MEASURED_DISTANCE)) {
                     Position position = new Position(x, y);
                     List<Double> observations = new ArrayList<>();
                     for (int i = 0; i < this.observationsAtEachPoint; i++) {

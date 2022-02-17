@@ -41,7 +41,7 @@ class GPRModel:
             coord_of_highest_abs_value = coords[values.index(highest_abs_value)]
             test_result = self.gp.predict([(coord_of_highest_abs_value[0] + 0.1, coord_of_highest_abs_value[1] + 0.1)])
             if abs((test_result - highest_abs_value)/highest_abs_value) < 0.4:
-                self.plot3D()
+                self.plot2D()
                 break
             else:
                 print("Fitted incorrectly. Recalculating...")

@@ -7,12 +7,17 @@ public class IndoorPositioningSettings {
     /**
      * The highest x value of all reference points
      */
-    public static final float ROOM_WIDTH = 6;
+    public static final float ROOM_WIDTH = 11;
 
     /**
      * The highest y value of all reference points
      */
-    public static final float ROOM_HEIGHT = 6;
+    public static final float ROOM_HEIGHT = 11;
+
+    /**
+     * The difference between reference points when measuring (For the simulator)
+     */
+    public static final double REFERENCE_POINT_MEASURED_DISTANCE = 0.5;
 
     /**
      * The difference between reference points after GPR has been applied
@@ -34,7 +39,7 @@ public class IndoorPositioningSettings {
      * a) The Process Distributions function generates simulated data instead of pulling it from the database
      * b) The observed RSSI values are simulated in the Indoor Localisation Activity
      */
-    public static final boolean SHOULD_SIMULATE = false;
+    public static final boolean SHOULD_SIMULATE = true;
 
     //TODO: use these
     /**
