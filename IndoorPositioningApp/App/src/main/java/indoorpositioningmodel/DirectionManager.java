@@ -6,7 +6,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 public class DirectionManager implements SensorEventListener {
 
@@ -27,7 +26,7 @@ public class DirectionManager implements SensorEventListener {
     }
 
     public float getCurrentDegreesFromNorth() {
-        return this.currentDegreesFromNorth;
+        return (float) (IndoorPositioningSettings.PDR_X_AXIS_FLIP * this.currentDegreesFromNorth);
     }
 
     public void onPause() {
@@ -67,7 +66,7 @@ public class DirectionManager implements SensorEventListener {
                 currentDegreesFromNorth = -angle * 360 / (2 * 3.14159f);
 
                 if (onDirectionChangedCallback != null) {
-                    onDirectionChangedCallback.onDirectionChanged(currentDegreesFromNorth);
+                    onDirectionChangedCallback.onDirectionChanged(getCurrentDegreesFromNorth());
                 }
             }
         }
