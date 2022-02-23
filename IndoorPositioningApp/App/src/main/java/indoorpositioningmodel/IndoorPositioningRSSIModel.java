@@ -104,9 +104,9 @@ public class IndoorPositioningRSSIModel {
             return RSSIDistributions;
 
         } catch (JSONException e) {
-            Log.d("Riccardo | JSONException", e.getMessage());
+            Log.d("IndoorPositioning | JSONException", e.getMessage());
         } catch (IOException e) {
-            Log.d("Riccardo | IOException", e.getMessage());
+            Log.d("IndoorPositioning | IOException", e.getMessage());
         }
 
         return null;
@@ -147,7 +147,7 @@ public class IndoorPositioningRSSIModel {
             for (int col = 0; col < probabilitySums.xArrayLength; col++) {
                 string.append(probabilitySums.getValueAtIndex(row, col) > thresholdProbability ? "#," : " ,");
             }
-            Log.d("Riccardo", string.toString());
+            Log.d("IndoorPositioning", string.toString());
         }
 
         return calcCentroid(probabilitySums, thresholdProbability);

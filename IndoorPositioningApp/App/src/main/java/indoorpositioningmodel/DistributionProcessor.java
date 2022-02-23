@@ -99,9 +99,9 @@ public class DistributionProcessor {
             Toast.makeText(activity, "Saving Complete.", Toast.LENGTH_SHORT).show();
 
         } catch (JSONException e) {
-            Log.d("Riccardo | JSONException", e.getMessage());
+            Log.d("IndoorPositioning | JSONException", e.getMessage());
         } catch (IOException e) {
-            Log.d("Riccardo | IOException", e.getMessage());
+            Log.d("IndoorPositioning | IOException", e.getMessage());
         }
     }
 }

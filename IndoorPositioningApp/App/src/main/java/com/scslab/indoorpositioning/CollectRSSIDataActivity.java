@@ -164,7 +164,7 @@ public class CollectRSSIDataActivity extends AppCompatActivity {
                 unregisterReceiver(broadcastReceiver);
                 currentAutoRefreshIndex = 0;
             } catch(IllegalArgumentException e) {
-                Log.d("Riccardo", "receiver already unregistered");
+                Log.d("IndoorPositioning", "receiver already unregistered");
             }
         }
     }

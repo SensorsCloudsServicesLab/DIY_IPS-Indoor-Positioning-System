@@ -282,7 +282,7 @@ public class DatabaseWrapper {
 
                     onCompleteListener.onComplete(parsedDirectionalRSSIData);
                 } else {
-                    Log.d("Riccardo", "Error getting documents: ", task1.getException());
+                    Log.d("IndoorPositioning", "Error getting documents: ", task1.getException());
                 }
             });
     }
