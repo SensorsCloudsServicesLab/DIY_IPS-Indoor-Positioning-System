@@ -5,7 +5,7 @@ Indoor Positioning System using WiFi Access Points and Pedestrian Dead Reckoning
 ## Activities
 The project includes two main activities:  
 1. The first activity allows you to sample, record, and upload WiFi RSSI values  
-2. The second activity allows you to see your current position indoors.  
+2. The second activity allows you to see your current position indoors (Your position is the red dot, and the direction you are facing is the orange dot)
 
 <p align="center">
     <img src="/image/main_activity.jpg" height="600" alt="Main Activity"/>
