@@ -9,9 +9,11 @@ The project includes two main activities:
 1. The first activity allows you to sample, record, and upload WiFi RSSI values  
 2. The second activity allows you to see your current position indoors.  
 
-<img src="/image/main_activity.jpg" height="600" alt="Main Activity"/>
-<img src="/image/rssi_activity.jpg" height="600" alt="RSSI Sampling Activity"/>
-<img src="/image/positioning_activity.jpg" height="600" alt="Indoor Positioning Activity"/>
+<p align="center">
+    <img src="/image/main_activity.jpg" height="600" alt="Main Activity"/>
+    <img src="/image/rssi_activity.jpg" height="600" alt="RSSI Sampling Activity"/>
+    <img src="/image/positioning_activity.jpg" height="600" alt="Indoor Positioning Activity"/>
+</p>
 
 ## Technologies
 - Android Studio
