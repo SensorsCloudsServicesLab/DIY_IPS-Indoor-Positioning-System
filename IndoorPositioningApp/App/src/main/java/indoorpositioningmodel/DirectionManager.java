@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.widget.Button;
 
 import com.scslab.indoorpositioning.R;
 
@@ -27,9 +28,13 @@ public class DirectionManager implements SensorEventListener {
         this.magnetometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         this.onDirectionChangedCallback = onDirectionChangedCallback;
 
-        activity.findViewById(R.id.calibrate_north).setOnClickListener((v) -> {
-            this.calibrateNorth();
-        });
+        //Check if a calibration button exists
+        Button calibrationButton = activity.findViewById(R.id.calibrate_north);
+        if (calibrationButton != null) {
+            calibrationButton.setOnClickListener((v) -> {
+                this.calibrateNorth();
+            });
+        }
     }
 
     public float getCurrentDegreesFromNorth() {
