@@ -10,7 +10,7 @@ The project's  main activities is shown in Figure 1.
 
 <p align="center"><b>Figure 1</b>. Main Page</p>
 
-<img src="/image/main.png" height="600" alt="Main Activity"/>
+<p align="center"><img src="/image/main.png" height="600" alt="Main Activity"/></p>
 
 
 
@@ -18,7 +18,7 @@ The project's  main activities is shown in Figure 1.
 
 <p align="center"><b>Figure 2</b>. Collect RSSI Data</p>
 
-<img src="/image/rssi.png" height="600" alt="RSSI Sampling Activity"/>
+<p align="center"><img src="/image/rssi.png" height="600" alt="RSSI Sampling Activity"/></p>
 
 
 
@@ -26,7 +26,7 @@ The project's  main activities is shown in Figure 1.
 
 <p align="center"><b>Figure 3</b>. Indoor Localisation</p>
 
-<img src="/image/positioning_activity.jpg" height="600" alt="Indoor Positioning Activity"/>
+<p align="center"><img src="/image/positioning_activity.jpg" height="600" alt="Indoor Positioning Activity"/></p>
 
 
 
@@ -34,7 +34,7 @@ The project's  main activities is shown in Figure 1.
 
 <p align="center"><b>Figure 4</b>. Test Accuracy</p>
 
-<img src="/image/accuracy.png" height="600" alt="Test Accuracy Activity"/>
+<p align="center"><img src="/image/accuracy.png" height="600" alt="Test Accuracy Activity"/></p>
 
 
 ## Technologies
