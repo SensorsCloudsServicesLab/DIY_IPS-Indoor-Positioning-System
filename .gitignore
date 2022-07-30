@@ -1,1 +1,16 @@
 .DS_Store
+**/.gradle
+**/build/
+**/.gradletasknamecache
+**/.project
+**/.classpath
+**/.idea
+**/__pycache__
+IndoorPosition\data\model
+IndoorPosition\data\pre
+IndoorPosition\data\local_records.json
+TestAccuracy\CrossValidation\model
+TestAccuracy\CrossValidation\pre
+**/google-services.json
+**/local.properties
+*.json

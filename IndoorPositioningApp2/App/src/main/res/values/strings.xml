@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Indoor Positioning</string>
+    <string name="indoor_wifi_positioning">Indoor WiFi Positioning</string>
+    <string name="automatic_gps_title">Automatic GPS</string>
+    <string name="user_id_title">User ID</string>
+    <string name="detected_networks">Detected Networks</string>
+    <string name="refresh">Refresh</string>
+    <string name="auto_refresh">Auto Refresh &amp; Submit</string>
+    <string name="collect_rssi_text">Collect RSSI Data</string>
+    <string name="process_distributions_text">Process Distributions Data</string>
+    <string name="process_regression_text">Process Regression Data</string>
+    <string name="indoor_localisation_text">Indoor Localisation</string>
+    <string name="test_accuracy">Test Accuracy</string>
+    <string name="joe_model_text">Joe Model</string>
+    <string name="submit">Submit</string>
+    <string name="ref_x">Reference X</string>
+    <string name="reference_y">Reference Y</string>
+    <string name="est_x">Estimate X</string>
+    <string name="est_y">Estimate Y</string>
+    <string name="error">Error</string>
+    <string name="up_arrow">▲</string>
+    <string name="left_arrow">◀</string>
+    <string name="right_arrow">▶</string>
+    <string name="down_arrow">▼</string>
+    <string name="zero">0</string>
+    <string name="angle_label">Angle Start From North</string>
+    <string name="auto_refresh_amp_submit_off">Auto Refresh &amp; Submit: Off</string>
+    <string name="auto_refresh_amp_submit_on">Auto Refresh &amp; Submit: On</string>
+    <string name="floor_plan">Floor Plan</string>
+    <string name="refresh_rssi_localisation">Refresh using Fingerprint</string>
+    <string name="upload_data">Upload Data</string>
+    <string name="calibrate_north_direction">Calibrate North Direction</string>
+</resources>
