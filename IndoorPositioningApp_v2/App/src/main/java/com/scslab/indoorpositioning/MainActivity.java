@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private Button processRegressionButton;
     private Button indoorLocalisationButton;
     private Button testAccuracy;
-    private Button joeModel;
+//    private Button joeModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         this.processRegressionButton = findViewById(R.id.process_regression_data_button);
         this.indoorLocalisationButton = findViewById(R.id.indoor_localisation_button);
         this.testAccuracy = findViewById(R.id.test_accuracy);
-        this.joeModel = findViewById(R.id.joe_model);
+//        this.joeModel = findViewById(R.id.joe_model);
         //Initialisations
         initUI();
     }
@@ -89,10 +89,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        joeModel.setOnClickListener(v -> {
-            Intent intent = new Intent(this, JoeModelActivity.class);
-            startActivity(intent);
-        });
+//        joeModel.setOnClickListener(v -> {
+//            Intent intent = new Intent(this, JoeModelActivity.class);
+//            startActivity(intent);
+//        });
     }
 
     private boolean requestPermissions() {

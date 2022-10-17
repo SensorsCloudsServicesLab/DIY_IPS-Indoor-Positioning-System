@@ -43,7 +43,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     android:contentDescription="@string/floor_plan"
-                    app:srcCompat="@drawable/floor_plan"
+                    app:srcCompat="@drawable/grid"
                     android:adjustViewBounds="true" />
 
                 <ImageView
